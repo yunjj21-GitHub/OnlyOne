@@ -8,4 +8,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="light_gray">#EAEAEA</color>
     <color name="bone_muted">#C2C2C2</color>
+    <color name="memo_paper">#EEEEEE</color>
 </resources>

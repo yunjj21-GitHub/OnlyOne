@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -32,6 +34,10 @@ private val MemoTopBarHorizontalPadding = 10.dp
 private val MemoTopBarSideMinWidth = 48.dp
 private val MemoBackButtonSize = 48.dp
 private val MemoSaveEndPadding = 16.dp
+private val MemoPaperCornerRadius = 28.dp
+private val MemoPaperHorizontalPadding = 20.dp
+private val MemoPaperTopPadding = 8.dp
+private val MemoPaperBottomPadding = 16.dp
 
 @Composable
 fun MemoScreen(
@@ -88,6 +94,24 @@ fun MemoScreen(
                     style = topBarTextStyle,
                 )
             }
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(
+                    start = MemoPaperHorizontalPadding,
+                    end = MemoPaperHorizontalPadding,
+                    top = MemoPaperTopPadding,
+                    bottom = MemoPaperBottomPadding,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(MemoPaperCornerRadius),
+                color = colorResource(R.color.memo_paper),
+            ) {}
         }
     }
 }
