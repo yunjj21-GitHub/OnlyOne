@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -23,18 +24,37 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.yjp.onlyone.R
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
 private val PetProgressRingSize = 220.dp
+private val PetTextSizeReduce = 2.sp
 
 @Composable
 fun HomeScreen(
     petName: String,
     @DrawableRes petIconRes: Int = R.drawable.ic_dog1,
     happinessProgress: Float = HomeViewModel.DEFAULT_HAPPINESS_PROGRESS,
+    daysTogether: Int = HomeViewModel.DEFAULT_DAYS_TOGETHER,
     modifier: Modifier = Modifier,
 ) {
+    val togetherDaysText = remember(daysTogether) {
+        HomeViewModel.buildTogetherDaysText(daysTogether)
+    }
+    val headlineMedium = MaterialTheme.typography.headlineMedium
+    val baseFontSizeValue = headlineMedium.fontSize.value
+    val petNameStyle = headlineMedium.copy(
+        fontSize = baseFontSizeValue.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurface,
+    )
+    val togetherDaysStyle = headlineMedium.copy(
+        fontSize = (baseFontSizeValue - PetTextSizeReduce.value).sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurface,
+    )
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -51,31 +71,35 @@ fun HomeScreen(
                 HomeTopIconButton(iconRes = R.drawable.ic_speech_bubble)
                 HomeTopIconButton(iconRes = R.drawable.ic_pencil)
             }
-            Box(contentAlignment = Alignment.TopCenter) {
-                Box(
-                    modifier = Modifier
-                        .padding(top = 14.dp)
-                        .size(PetProgressRingSize),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    PetProgressRing(
-                        progress = happinessProgress,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    Image(
-                        painter = painterResource(petIconRes),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit,
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(contentAlignment = Alignment.TopCenter) {
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 14.dp)
+                            .size(PetProgressRingSize),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        PetProgressRing(
+                            progress = happinessProgress,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                        Image(
+                            painter = painterResource(petIconRes),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Fit,
+                        )
+                    }
+                    Text(
+                        text = petName,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        style = petNameStyle,
                     )
                 }
                 Text(
-                    text = petName,
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    ),
+                    text = togetherDaysText,
+                    modifier = Modifier.padding(top = 8.dp),
+                    style = togetherDaysStyle,
                 )
             }
         }
@@ -111,6 +135,7 @@ private fun HomeScreenPreview() {
             petName = HomeViewModel.DEFAULT_PET_NAME,
             petIconRes = HomeViewModel.DEFAULT_PET_ICON_RES,
             happinessProgress = HomeViewModel.DEFAULT_HAPPINESS_PROGRESS,
+            daysTogether = HomeViewModel.DEFAULT_DAYS_TOGETHER,
         )
     }
 }

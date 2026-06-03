@@ -32,10 +32,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             val petName by viewModel.petName.collectAsStateWithLifecycle()
             val petIconRes by viewModel.petIconRes.collectAsStateWithLifecycle()
             val happinessProgress by viewModel.happinessProgress.collectAsStateWithLifecycle()
+            val daysTogether by viewModel.daysTogether.collectAsStateWithLifecycle()
             HomeScreen(
                 petName = petName,
                 petIconRes = petIconRes,
                 happinessProgress = happinessProgress,
+                daysTogether = daysTogether,
             )
         }
     }
