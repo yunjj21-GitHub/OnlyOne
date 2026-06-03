@@ -101,7 +101,7 @@ fun MemoScreen(
                 contentAlignment = Alignment.CenterEnd,
             ) {
                 Text(
-                    text = stringResource(R.string.memo_save),
+                    text = stringResource(R.string.save),
                     modifier = Modifier
                         .padding(end = MemoSaveEndPadding)
                         .clickable(

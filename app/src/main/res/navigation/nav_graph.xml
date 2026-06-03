@@ -30,7 +30,13 @@
     <fragment
         android:id="@+id/dogInfoEditFragment"
         android:name="com.yjp.onlyone.presentation.doginfoedit.DogInfoEditFragment"
-        android:label="@string/dog_info_edit_title" />
+        android:label="@string/dog_info_edit_title">
+        <action
+            android:id="@+id/action_dog_info_edit_to_home"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/dogInfoEditFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/memoFragment"
