@@ -35,7 +35,7 @@ fun SplashScreen(modifier: Modifier = Modifier) {
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.Center)
-                .size(160.dp),
+                .size(180.dp),
         )
     }
 }
