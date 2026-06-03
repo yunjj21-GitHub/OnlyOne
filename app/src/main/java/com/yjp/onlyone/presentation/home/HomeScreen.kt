@@ -3,6 +3,8 @@ package com.yjp.onlyone.presentation.home
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.verticalScroll
@@ -75,6 +77,7 @@ fun HomeScreen(
     @DrawableRes petIconRes: Int = R.drawable.ic_dog1,
     happinessIndex: Int = HomeViewModel.DEFAULT_HAPPINESS_INDEX,
     daysTogether: Int = HomeViewModel.DEFAULT_DAYS_TOGETHER,
+    onMemoClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val happinessProgress = remember(happinessIndex) {
@@ -121,7 +124,10 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            HomeTopIconButton(iconRes = R.drawable.ic_speech_bubble)
+            HomeTopIconButton(
+                iconRes = R.drawable.ic_speech_bubble,
+                onClick = onMemoClick,
+            )
             HomeTopIconButton(iconRes = R.drawable.ic_pencil)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -253,10 +259,17 @@ private fun HomeActivityStatColumn(
 @Composable
 private fun HomeTopIconButton(
     @DrawableRes iconRes: Int,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        modifier = modifier.size(48.dp),
+        modifier = modifier
+            .size(48.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+            ),
         shape = CircleShape,
         color = colorResource(R.color.light_gray),
         shadowElevation = 0.dp,

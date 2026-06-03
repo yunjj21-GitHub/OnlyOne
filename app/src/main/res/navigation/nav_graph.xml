@@ -18,5 +18,14 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.yjp.onlyone.presentation.home.HomeFragment"
-        android:label="@string/home_title" />
+        android:label="@string/home_title">
+        <action
+            android:id="@+id/action_home_to_memo"
+            app:destination="@id/memoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/memoFragment"
+        android:name="com.yjp.onlyone.presentation.memo.MemoFragment"
+        android:label="@string/memo_title" />
 </navigation>

@@ -6,11 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import com.yjp.onlyone.R
 import com.yjp.onlyone.base.BaseFragment
 import com.yjp.onlyone.base.setThemeContent
 import com.yjp.onlyone.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
@@ -38,7 +44,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 petIconRes = petIconRes,
                 happinessIndex = happinessIndex,
                 daysTogether = daysTogether,
+                onMemoClick = viewModel::onMemoClick,
             )
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigationEvent.collect { event ->
+                    if (event == HomeNavigation.ToMemo) {
+                        findNavController().navigate(R.id.action_home_to_memo)
+                    }
+                }
+            }
         }
     }
 }

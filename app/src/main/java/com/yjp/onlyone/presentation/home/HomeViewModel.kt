@@ -2,11 +2,16 @@ package com.yjp.onlyone.presentation.home
 
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yjp.onlyone.R
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -26,6 +31,15 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
     private val _daysTogether = MutableStateFlow(DEFAULT_DAYS_TOGETHER)
     val daysTogether: StateFlow<Int> = _daysTogether.asStateFlow()
+
+    private val _navigationEvent = MutableSharedFlow<HomeNavigation>(extraBufferCapacity = 1)
+    val navigationEvent: SharedFlow<HomeNavigation> = _navigationEvent.asSharedFlow()
+
+    fun onMemoClick() {
+        viewModelScope.launch {
+            _navigationEvent.emit(HomeNavigation.ToMemo)
+        }
+    }
 
     fun updatePetName(name: String) {
         _petName.value = name
