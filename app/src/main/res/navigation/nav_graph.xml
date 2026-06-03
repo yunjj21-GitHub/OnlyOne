@@ -27,5 +27,11 @@
     <fragment
         android:id="@+id/memoFragment"
         android:name="com.yjp.onlyone.presentation.memo.MemoFragment"
-        android:label="@string/memo_title" />
+        android:label="@string/memo_title">
+        <action
+            android:id="@+id/action_memo_to_home"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/memoFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>
