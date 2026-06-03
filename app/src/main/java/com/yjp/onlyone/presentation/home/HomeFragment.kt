@@ -31,12 +31,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         binding.homeComposeView.setThemeContent {
             val petName by viewModel.petName.collectAsStateWithLifecycle()
             val petIconRes by viewModel.petIconRes.collectAsStateWithLifecycle()
-            val happinessProgress by viewModel.happinessProgress.collectAsStateWithLifecycle()
+            val happinessIndex by viewModel.happinessIndex.collectAsStateWithLifecycle()
             val daysTogether by viewModel.daysTogether.collectAsStateWithLifecycle()
             HomeScreen(
                 petName = petName,
                 petIconRes = petIconRes,
-                happinessProgress = happinessProgress,
+                happinessIndex = happinessIndex,
                 daysTogether = daysTogether,
             )
         }

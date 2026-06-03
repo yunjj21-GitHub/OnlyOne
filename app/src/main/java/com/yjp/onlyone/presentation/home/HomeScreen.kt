@@ -37,15 +37,20 @@ private val PetTextSizeReduce = 2.sp
 private val HomeContentPanelCornerRadius = 14.dp
 private val HomeContentPanelHeight = 200.dp
 private val HomeContentPanelShadowElevation = 6.dp
+private val HappinessIndexLabelFontSize = 19.sp
+private val HappinessIndexLabelLineHeight = 26.sp
 
 @Composable
 fun HomeScreen(
     petName: String,
     @DrawableRes petIconRes: Int = R.drawable.ic_dog1,
-    happinessProgress: Float = HomeViewModel.DEFAULT_HAPPINESS_PROGRESS,
+    happinessIndex: Int = HomeViewModel.DEFAULT_HAPPINESS_INDEX,
     daysTogether: Int = HomeViewModel.DEFAULT_DAYS_TOGETHER,
     modifier: Modifier = Modifier,
 ) {
+    val happinessProgress = remember(happinessIndex) {
+        HomeViewModel.happinessProgress(happinessIndex)
+    }
     val togetherDaysText = remember(daysTogether) {
         HomeViewModel.buildTogetherDaysText(daysTogether)
     }
@@ -109,6 +114,7 @@ fun HomeScreen(
                 style = togetherDaysStyle,
             )
             HomeContentPanel(
+                happinessIndex = happinessIndex,
                 modifier = Modifier.padding(top = 16.dp),
             )
         }
@@ -116,7 +122,16 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeContentPanel(modifier: Modifier = Modifier) {
+private fun HomeContentPanel(
+    happinessIndex: Int,
+    modifier: Modifier = Modifier,
+) {
+    val happinessIndexLabelStyle = MaterialTheme.typography.titleMedium.copy(
+        fontSize = HappinessIndexLabelFontSize,
+        lineHeight = HappinessIndexLabelLineHeight,
+        fontWeight = FontWeight.Black,
+        color = colorResource(R.color.black),
+    )
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -124,7 +139,19 @@ private fun HomeContentPanel(modifier: Modifier = Modifier) {
         shape = RoundedCornerShape(HomeContentPanelCornerRadius),
         color = colorResource(R.color.white),
         shadowElevation = HomeContentPanelShadowElevation,
-    ) {}
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            contentAlignment = Alignment.TopStart,
+        ) {
+            Text(
+                text = "행복지수 $happinessIndex",
+                style = happinessIndexLabelStyle,
+            )
+        }
+    }
 }
 
 @Composable
@@ -155,7 +182,7 @@ private fun HomeScreenPreview() {
         HomeScreen(
             petName = HomeViewModel.DEFAULT_PET_NAME,
             petIconRes = HomeViewModel.DEFAULT_PET_ICON_RES,
-            happinessProgress = HomeViewModel.DEFAULT_HAPPINESS_PROGRESS,
+            happinessIndex = HomeViewModel.DEFAULT_HAPPINESS_INDEX,
             daysTogether = HomeViewModel.DEFAULT_DAYS_TOGETHER,
         )
     }
