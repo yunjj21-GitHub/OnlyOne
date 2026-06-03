@@ -41,6 +41,12 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun onDogInfoEditClick() {
+        viewModelScope.launch {
+            _navigationEvent.emit(HomeNavigation.ToDogInfoEdit)
+        }
+    }
+
     fun updatePetName(name: String) {
         _petName.value = name
     }

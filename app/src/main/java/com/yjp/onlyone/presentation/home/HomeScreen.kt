@@ -78,6 +78,7 @@ fun HomeScreen(
     happinessIndex: Int = HomeViewModel.DEFAULT_HAPPINESS_INDEX,
     daysTogether: Int = HomeViewModel.DEFAULT_DAYS_TOGETHER,
     onMemoClick: () -> Unit = {},
+    onDogInfoEditClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val happinessProgress = remember(happinessIndex) {
@@ -128,7 +129,10 @@ fun HomeScreen(
                 iconRes = R.drawable.ic_speech_bubble,
                 onClick = onMemoClick,
             )
-            HomeTopIconButton(iconRes = R.drawable.ic_pencil)
+            HomeTopIconButton(
+                iconRes = R.drawable.ic_pencil,
+                onClick = onDogInfoEditClick,
+            )
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Box(contentAlignment = Alignment.TopCenter) {

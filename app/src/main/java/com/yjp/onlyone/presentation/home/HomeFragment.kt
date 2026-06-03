@@ -45,13 +45,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 happinessIndex = happinessIndex,
                 daysTogether = daysTogether,
                 onMemoClick = viewModel::onMemoClick,
+                onDogInfoEditClick = viewModel::onDogInfoEditClick,
             )
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.navigationEvent.collect { event ->
-                    if (event == HomeNavigation.ToMemo) {
-                        findNavController().navigate(R.id.action_home_to_memo)
+                    when (event) {
+                        HomeNavigation.ToMemo ->
+                            findNavController().navigate(R.id.action_home_to_memo)
+                        HomeNavigation.ToDogInfoEdit ->
+                            findNavController().navigate(R.id.action_home_to_dog_info_edit)
                     }
                 }
             }

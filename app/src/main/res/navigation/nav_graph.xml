@@ -22,7 +22,15 @@
         <action
             android:id="@+id/action_home_to_memo"
             app:destination="@id/memoFragment" />
+        <action
+            android:id="@+id/action_home_to_dog_info_edit"
+            app:destination="@id/dogInfoEditFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/dogInfoEditFragment"
+        android:name="com.yjp.onlyone.presentation.doginfoedit.DogInfoEditFragment"
+        android:label="@string/dog_info_edit_title" />
 
     <fragment
         android:id="@+id/memoFragment"
