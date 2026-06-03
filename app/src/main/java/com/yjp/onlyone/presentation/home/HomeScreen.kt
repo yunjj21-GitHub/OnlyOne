@@ -2,7 +2,9 @@ package com.yjp.onlyone.presentation.home
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,53 +57,52 @@ fun HomeScreen(
         color = MaterialTheme.colorScheme.onSurface,
     )
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)
-                .padding(horizontal = 20.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                HomeTopIconButton(iconRes = R.drawable.ic_speech_bubble)
-                HomeTopIconButton(iconRes = R.drawable.ic_pencil)
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(contentAlignment = Alignment.TopCenter) {
-                    Box(
-                        modifier = Modifier
-                            .padding(top = 14.dp)
-                            .size(PetProgressRingSize),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        PetProgressRing(
-                            progress = happinessProgress,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                        Image(
-                            painter = painterResource(petIconRes),
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit,
-                        )
-                    }
-                    Text(
-                        text = petName,
-                        modifier = Modifier.align(Alignment.TopCenter),
-                        style = petNameStyle,
+            HomeTopIconButton(iconRes = R.drawable.ic_speech_bubble)
+            HomeTopIconButton(iconRes = R.drawable.ic_pencil)
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(contentAlignment = Alignment.TopCenter) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 14.dp)
+                        .size(PetProgressRingSize),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    PetProgressRing(
+                        progress = happinessProgress,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    Image(
+                        painter = painterResource(petIconRes),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit,
                     )
                 }
                 Text(
-                    text = togetherDaysText,
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = togetherDaysStyle,
+                    text = petName,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    style = petNameStyle,
                 )
             }
+            Text(
+                text = togetherDaysText,
+                modifier = Modifier.padding(top = 8.dp),
+                style = togetherDaysStyle,
+            )
         }
     }
 }
