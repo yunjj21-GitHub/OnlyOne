@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,10 +26,13 @@ import androidx.compose.ui.unit.dp
 import com.yjp.onlyone.R
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
+private val PetProgressRingSize = 220.dp
+
 @Composable
 fun HomeScreen(
     petName: String,
     @DrawableRes petIconRes: Int = R.drawable.ic_dog1,
+    happinessProgress: Float = HomeViewModel.DEFAULT_HAPPINESS_PROGRESS,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -47,16 +51,24 @@ fun HomeScreen(
                 HomeTopIconButton(iconRes = R.drawable.ic_speech_bubble)
                 HomeTopIconButton(iconRes = R.drawable.ic_pencil)
             }
-            Box(
-                contentAlignment = Alignment.TopCenter,
-            ) {
-                Image(
-                    painter = painterResource(petIconRes),
-                    contentDescription = null,
+            Box(contentAlignment = Alignment.TopCenter) {
+                Box(
                     modifier = Modifier
                         .padding(top = 14.dp)
-                        .size(180.dp),
-                )
+                        .size(PetProgressRingSize),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    PetProgressRing(
+                        progress = happinessProgress,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    Image(
+                        painter = painterResource(petIconRes),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit,
+                    )
+                }
                 Text(
                     text = petName,
                     modifier = Modifier.align(Alignment.TopCenter),
@@ -98,6 +110,7 @@ private fun HomeScreenPreview() {
         HomeScreen(
             petName = HomeViewModel.DEFAULT_PET_NAME,
             petIconRes = HomeViewModel.DEFAULT_PET_ICON_RES,
+            happinessProgress = HomeViewModel.DEFAULT_HAPPINESS_PROGRESS,
         )
     }
 }
