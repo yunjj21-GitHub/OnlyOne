@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,6 +34,9 @@ import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
 private val PetProgressRingSize = 220.dp
 private val PetTextSizeReduce = 2.sp
+private val HomeContentPanelCornerRadius = 14.dp
+private val HomeContentPanelHeight = 200.dp
+private val HomeContentPanelShadowElevation = 6.dp
 
 @Composable
 fun HomeScreen(
@@ -103,8 +108,23 @@ fun HomeScreen(
                 modifier = Modifier.padding(top = 8.dp),
                 style = togetherDaysStyle,
             )
+            HomeContentPanel(
+                modifier = Modifier.padding(top = 16.dp),
+            )
         }
     }
+}
+
+@Composable
+private fun HomeContentPanel(modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(HomeContentPanelHeight),
+        shape = RoundedCornerShape(HomeContentPanelCornerRadius),
+        color = colorResource(R.color.white),
+        shadowElevation = HomeContentPanelShadowElevation,
+    ) {}
 }
 
 @Composable
