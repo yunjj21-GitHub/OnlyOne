@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -34,19 +35,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yjp.onlyone.R
+import com.yjp.onlyone.ui.modifier.homeHappinessCardShadow
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
 private val PetProgressRingSize = 220.dp
 private val PetTextSizeReduce = 2.sp
-private val HomeBackgroundGradientStops = arrayOf(
-    0f to R.color.white,
-    0.86f to R.color.white,
-    1f to R.color.primary_blue,
-)
-
 private val HomeContentPanelCornerRadius = 14.dp
 private val HomeContentPanelContentPadding = 20.dp
-private val HomeContentPanelShadowElevation = 6.dp
+private val HomeContentPanelShadowBleedHorizontal = 6.dp
+private val HomeContentPanelShadowBleedBottom = 6.dp
 private val HappinessIndexLabelFontSize = 19.sp
 private val HappinessIndexLabelLineHeight = 26.sp
 private val HomeActivityStatsTopPadding = 16.dp
@@ -100,10 +97,13 @@ fun HomeScreen(
         color = MaterialTheme.colorScheme.onSurface,
     )
 
+    val primaryBlue = colorResource(R.color.primary_blue)
     val homeBackgroundBrush = Brush.verticalGradient(
-        colorStops = HomeBackgroundGradientStops.map { (stop, colorRes) ->
-            stop to colorResource(colorRes)
-        }.toTypedArray(),
+        colorStops = arrayOf(
+            0f to Color.Transparent,
+            0.86f to Color.Transparent,
+            1f to primaryBlue,
+        ),
     )
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -184,35 +184,46 @@ private fun HomeContentPanel(
         fontWeight = FontWeight.Black,
         color = colorResource(R.color.black),
     )
-    Surface(
+    val panelShape = RoundedCornerShape(HomeContentPanelCornerRadius)
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = RoundedCornerShape(HomeContentPanelCornerRadius),
-        color = colorResource(R.color.white),
-        shadowElevation = HomeContentPanelShadowElevation,
+            .padding(
+                start = HomeContentPanelShadowBleedHorizontal,
+                end = HomeContentPanelShadowBleedHorizontal,
+                bottom = HomeContentPanelShadowBleedBottom,
+            ),
     ) {
-        Column(
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(HomeContentPanelContentPadding),
+                .wrapContentHeight()
+                .homeHappinessCardShadow(panelShape),
+            shape = panelShape,
+            color = colorResource(R.color.white),
         ) {
-            Text(
-                text = "행복지수 $happinessIndex",
-                style = happinessIndexLabelStyle,
-            )
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = HomeActivityStatsTopPadding),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top,
+                    .padding(HomeContentPanelContentPadding),
             ) {
-                DefaultHomeActivityStats.forEach { stat ->
-                    HomeActivityStatColumn(
-                        label = stat.label,
-                        value = stat.value,
-                    )
+                Text(
+                    text = "행복지수 $happinessIndex",
+                    style = happinessIndexLabelStyle,
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = HomeActivityStatsTopPadding),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    DefaultHomeActivityStats.forEach { stat ->
+                        HomeActivityStatColumn(
+                            label = stat.label,
+                            value = stat.value,
+                        )
+                    }
                 }
             }
         }
@@ -276,7 +287,6 @@ private fun HomeTopIconButton(
             ),
         shape = CircleShape,
         color = colorResource(R.color.light_gray),
-        shadowElevation = 0.dp,
     ) {
         Box(contentAlignment = Alignment.Center) {
             Image(

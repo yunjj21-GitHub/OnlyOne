@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yjp.onlyone.R
 import com.yjp.onlyone.presentation.home.HomeViewModel
+import com.yjp.onlyone.ui.modifier.dogInfoPetIconShadow
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
 private val DogInfoEditTopBarTopPadding = 10.dp
@@ -40,7 +41,6 @@ private val DogInfoEditBackButtonSize = 48.dp
 private val DogInfoEditSaveEndPadding = 16.dp
 private val DogInfoEditPetIconAreaTopPadding = 24.dp
 private val DogInfoEditPetIconCircleSize = 220.dp
-private val DogInfoEditPetIconCircleShadowElevation = 6.dp
 private val DogInfoEditPetIconInnerPadding = 8.dp
 
 @Composable
@@ -139,10 +139,11 @@ private fun DogInfoEditPetIconView(
     @DrawableRes petIconRes: Int,
 ) {
     Surface(
-        modifier = Modifier.size(DogInfoEditPetIconCircleSize),
+        modifier = Modifier
+            .dogInfoPetIconShadow()
+            .size(DogInfoEditPetIconCircleSize),
         shape = CircleShape,
         color = colorResource(R.color.white),
-        shadowElevation = DogInfoEditPetIconCircleShadowElevation,
     ) {
         Box(
             modifier = Modifier
