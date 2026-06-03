@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,7 +35,7 @@ import com.yjp.onlyone.ui.theme.OnlyOneTheme
 private val PetProgressRingSize = 220.dp
 private val PetTextSizeReduce = 2.sp
 private val HomeContentPanelCornerRadius = 14.dp
-private val HomeContentPanelHeight = 240.dp
+private val HomeContentPanelContentPadding = 20.dp
 private val HomeContentPanelShadowElevation = 6.dp
 private val HappinessIndexLabelFontSize = 19.sp
 private val HappinessIndexLabelLineHeight = 26.sp
@@ -156,15 +156,15 @@ private fun HomeContentPanel(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .height(HomeContentPanelHeight),
+            .wrapContentHeight(),
         shape = RoundedCornerShape(HomeContentPanelCornerRadius),
         color = colorResource(R.color.white),
         shadowElevation = HomeContentPanelShadowElevation,
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
+                .fillMaxWidth()
+                .padding(HomeContentPanelContentPadding),
         ) {
             Text(
                 text = "행복지수 $happinessIndex",
