@@ -3,6 +3,7 @@ package com.yjp.onlyone.presentation.doginfoedit
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yjp.onlyone.R
 import com.yjp.onlyone.presentation.home.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,5 +33,28 @@ class DogInfoEditViewModel @Inject constructor() : ViewModel() {
 
     fun onSaveClick() {
         // TODO: persist dog info
+    }
+
+    fun onPetIconSelect(@DrawableRes iconRes: Int) {
+        if (iconRes in SELECTABLE_PET_ICON_RES) {
+            _petIconRes.value = iconRes
+        }
+    }
+
+    companion object {
+        val SELECTABLE_PET_ICON_RES: List<Int> = listOf(
+            R.drawable.ic_dog1,
+            R.drawable.ic_dog19,
+            R.drawable.ic_dog18,
+            R.drawable.ic_dog14,
+            R.drawable.ic_dog13,
+            R.drawable.ic_dog11,
+            R.drawable.ic_dog12,
+            R.drawable.ic_dog17,
+            R.drawable.ic_dog2,
+            R.drawable.ic_dog10,
+            R.drawable.ic_dog8,
+            R.drawable.ic_dog20,
+        )
     }
 }

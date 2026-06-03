@@ -40,6 +40,7 @@ class DogInfoEditFragment : BaseFragment<FragmentDogInfoEditBinding>() {
                 petIconRes = petIconRes,
                 onBackClick = viewModel::onBackClick,
                 onSaveClick = viewModel::onSaveClick,
+                onPetIconSelect = viewModel::onPetIconSelect,
             )
         }
         viewLifecycleOwner.lifecycleScope.launch {
