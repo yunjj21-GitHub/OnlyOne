@@ -2,6 +2,7 @@ package com.yjp.onlyone.presentation.home
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -34,6 +36,12 @@ import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
 private val PetProgressRingSize = 220.dp
 private val PetTextSizeReduce = 2.sp
+private val HomeBackgroundGradientStops = arrayOf(
+    0f to R.color.white,
+    0.86f to R.color.white,
+    1f to R.color.primary_blue,
+)
+
 private val HomeContentPanelCornerRadius = 14.dp
 private val HomeContentPanelContentPadding = 20.dp
 private val HomeContentPanelShadowElevation = 6.dp
@@ -42,7 +50,7 @@ private val HappinessIndexLabelLineHeight = 26.sp
 private val HomeActivityStatsTopPadding = 16.dp
 private val HomeActivityStatValueTopPadding = 14.dp
 private val HomeActivityStatBoneIconTopPadding = 4.dp
-private val HomeActivityStatBoneIconSize = 42.dp
+private val HomeActivityStatBoneIconSize = 40.dp
 private val HomeActivityStatLabelFontSize = 19.sp
 private val HomeActivityStatLabelLineHeight = 24.sp
 private val HomeActivityStatValueFontSize = 17.sp
@@ -88,14 +96,26 @@ fun HomeScreen(
         color = MaterialTheme.colorScheme.onSurface,
     )
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    val homeBackgroundBrush = Brush.verticalGradient(
+        colorStops = HomeBackgroundGradientStops.map { (stop, colorRes) ->
+            stop to colorResource(colorRes)
+        }.toTypedArray(),
+    )
+
+    Box(modifier = modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(homeBackgroundBrush),
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -138,6 +158,7 @@ fun HomeScreen(
                 happinessIndex = happinessIndex,
                 modifier = Modifier.padding(top = 16.dp),
             )
+        }
         }
     }
 }
@@ -197,7 +218,7 @@ private fun HomeActivityStatColumn(
     val labelStyle = MaterialTheme.typography.bodyMedium.copy(
         fontSize = HomeActivityStatLabelFontSize,
         lineHeight = HomeActivityStatLabelLineHeight,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.Normal,
         color = colorResource(R.color.black),
     )
     val valueStyle = MaterialTheme.typography.bodyMedium.copy(
