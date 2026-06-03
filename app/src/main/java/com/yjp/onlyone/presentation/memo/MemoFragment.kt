@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -33,7 +35,13 @@ class MemoFragment : BaseFragment<FragmentMemoBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.memoComposeView.setThemeContent {
-            MemoScreen(onBackClick = viewModel::onBackClick)
+            val memoContent by viewModel.memoContent.collectAsStateWithLifecycle()
+            MemoScreen(
+                memoContent = memoContent,
+                onMemoContentChange = viewModel::updateMemoContent,
+                onSaveClick = viewModel::onSaveClick,
+                onBackClick = viewModel::onBackClick,
+            )
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

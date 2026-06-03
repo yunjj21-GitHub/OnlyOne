@@ -19,10 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
@@ -49,10 +46,12 @@ private val MemoPaperContentPadding = 16.dp
 
 @Composable
 fun MemoScreen(
+    memoContent: String = "",
+    onMemoContentChange: (String) -> Unit = {},
+    onSaveClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    var memoContent by remember { mutableStateOf("") }
     val memoPaperColor = colorResource(R.color.memo_paper)
     val topBarTextStyle = MaterialTheme.typography.titleLarge.copy(
         fontWeight = FontWeight.Bold,
@@ -103,7 +102,13 @@ fun MemoScreen(
             ) {
                 Text(
                     text = stringResource(R.string.memo_save),
-                    modifier = Modifier.padding(end = MemoSaveEndPadding),
+                    modifier = Modifier
+                        .padding(end = MemoSaveEndPadding)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onSaveClick,
+                        ),
                     style = topBarTextStyle,
                 )
             }
@@ -127,7 +132,7 @@ fun MemoScreen(
             ) {
                 BasicTextField(
                     value = memoContent,
-                    onValueChange = { memoContent = it },
+                    onValueChange = onMemoContentChange,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(MemoPaperContentPadding)
