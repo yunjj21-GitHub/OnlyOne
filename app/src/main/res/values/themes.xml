@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.OnlyOne" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.OnlyOne" parent="Theme.AppCompat.Light.NoActionBar" />
+
+    <!-- Android 12+ 기본 스플래시: 흰 배경 + 흰 아이콘 → 커스텀 SplashFragment만 보이게 -->
+    <style name="Theme.OnlyOne.Launch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@color/white</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/white</item>
+        <item name="postSplashScreenTheme">@style/Theme.OnlyOne</item>
+    </style>
 </resources>
