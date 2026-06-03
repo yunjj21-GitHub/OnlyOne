@@ -3,5 +3,7 @@
     <string name="splash_title">Splash</string>
     <string name="home_title">Home</string>
     <string name="memo_title">Memo</string>
+    <string name="memo_screen_title">메모</string>
+    <string name="memo_save">저장</string>
     <string name="pet_name_default">내새꾸</string>
 </resources>
