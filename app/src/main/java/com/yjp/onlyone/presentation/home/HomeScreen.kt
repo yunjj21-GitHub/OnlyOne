@@ -35,10 +35,29 @@ import com.yjp.onlyone.ui.theme.OnlyOneTheme
 private val PetProgressRingSize = 220.dp
 private val PetTextSizeReduce = 2.sp
 private val HomeContentPanelCornerRadius = 14.dp
-private val HomeContentPanelHeight = 200.dp
+private val HomeContentPanelHeight = 240.dp
 private val HomeContentPanelShadowElevation = 6.dp
 private val HappinessIndexLabelFontSize = 19.sp
 private val HappinessIndexLabelLineHeight = 26.sp
+private val HomeActivityStatsTopPadding = 16.dp
+private val HomeActivityStatValueTopPadding = 4.dp
+private val HomeActivityStatLabelFontSize = 19.sp
+private val HomeActivityStatLabelLineHeight = 24.sp
+private val HomeActivityStatValueFontSize = 17.sp
+private val HomeActivityStatValueLineHeight = 22.sp
+
+private data class HomeActivityStat(
+    val label: String,
+    val value: String,
+)
+
+private val DefaultHomeActivityStats = listOf(
+    HomeActivityStat(label = "밥", value = "0회"),
+    HomeActivityStat(label = "산책", value = "0M"),
+    HomeActivityStat(label = "놀이", value = "0M"),
+    HomeActivityStat(label = "간식", value = "0회"),
+    HomeActivityStat(label = "양치", value = "X"),
+)
 
 @Composable
 fun HomeScreen(
@@ -140,17 +159,64 @@ private fun HomeContentPanel(
         color = colorResource(R.color.white),
         shadowElevation = HomeContentPanelShadowElevation,
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(20.dp),
-            contentAlignment = Alignment.TopStart,
         ) {
             Text(
                 text = "행복지수 $happinessIndex",
                 style = happinessIndexLabelStyle,
             )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = HomeActivityStatsTopPadding),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top,
+            ) {
+                DefaultHomeActivityStats.forEach { stat ->
+                    HomeActivityStatColumn(
+                        label = stat.label,
+                        value = stat.value,
+                    )
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun HomeActivityStatColumn(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    val labelStyle = MaterialTheme.typography.bodyMedium.copy(
+        fontSize = HomeActivityStatLabelFontSize,
+        lineHeight = HomeActivityStatLabelLineHeight,
+        fontWeight = FontWeight.Bold,
+        color = colorResource(R.color.black),
+    )
+    val valueStyle = MaterialTheme.typography.bodyMedium.copy(
+        fontSize = HomeActivityStatValueFontSize,
+        lineHeight = HomeActivityStatValueLineHeight,
+        fontWeight = FontWeight.Normal,
+        color = colorResource(R.color.black),
+    )
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = label,
+            style = labelStyle,
+        )
+        Text(
+            text = value,
+            modifier = Modifier.padding(top = HomeActivityStatValueTopPadding),
+            style = valueStyle,
+        )
     }
 }
 
