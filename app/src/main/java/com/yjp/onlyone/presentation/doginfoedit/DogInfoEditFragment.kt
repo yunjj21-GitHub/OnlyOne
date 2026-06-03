@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -33,7 +35,9 @@ class DogInfoEditFragment : BaseFragment<FragmentDogInfoEditBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.dogInfoEditComposeView.setThemeContent {
+            val petIconRes by viewModel.petIconRes.collectAsStateWithLifecycle()
             DogInfoEditScreen(
+                petIconRes = petIconRes,
                 onBackClick = viewModel::onBackClick,
                 onSaveClick = viewModel::onSaveClick,
             )
