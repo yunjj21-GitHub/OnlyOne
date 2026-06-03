@@ -41,6 +41,8 @@ private val HappinessIndexLabelFontSize = 19.sp
 private val HappinessIndexLabelLineHeight = 26.sp
 private val HomeActivityStatsTopPadding = 16.dp
 private val HomeActivityStatValueTopPadding = 4.dp
+private val HomeActivityStatBoneIconTopPadding = 4.dp
+private val HomeActivityStatBoneIconSize = 46.dp
 private val HomeActivityStatLabelFontSize = 19.sp
 private val HomeActivityStatLabelLineHeight = 24.sp
 private val HomeActivityStatValueFontSize = 17.sp
@@ -216,6 +218,13 @@ private fun HomeActivityStatColumn(
             text = value,
             modifier = Modifier.padding(top = HomeActivityStatValueTopPadding),
             style = valueStyle,
+        )
+        Image(
+            painter = painterResource(R.drawable.ic_bone_muted),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(top = HomeActivityStatBoneIconTopPadding)
+                .size(HomeActivityStatBoneIconSize),
         )
     }
 }
