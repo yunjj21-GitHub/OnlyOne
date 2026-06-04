@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,18 +42,17 @@ import com.yjp.onlyone.ui.theme.OnlyOneTheme
 private val DogInfoEditTopBarTopPadding = 10.dp
 private val DogInfoEditTopBarHorizontalPadding = 10.dp
 private val DogInfoEditTopBarSideMinWidth = 48.dp
-private val DogInfoEditBackButtonSize = 48.dp
+private val DogInfoEditBackButtonSize = 44.dp
 private val DogInfoEditSaveEndPadding = 16.dp
 private val DogInfoEditPetIconAreaTopPadding = 24.dp
 private val DogInfoEditPetIconCircleSize = 210.dp
 private val DogInfoEditPetIconInnerPadding = 4.dp
-private val DogInfoEditIconSectionTopPadding = 32.dp
-private val DogInfoEditIconSectionHorizontalPadding = 18.dp
+private val DogInfoEditIconSectionHorizontalPadding = 24.dp
+private val DogInfoEditIconSectionTopPadding = 20.dp
 private val DogInfoEditIconLabelToPickerTopPadding = 14.dp
 private const val DogInfoEditIconPickerColumnCount = 4
+private val DogInfoEditIconPickerItemSize = 70.dp
 private val DogInfoEditIconPickerItemInnerPadding = 2.dp
-private val DogInfoEditIconPickerItemSpacing = 10.dp
-private val DogInfoEditIconPickerRowSpacing = 10.dp
 private val DogInfoEditIconPickerUnselectedBorderWidth = 0.4.dp
 private val DogInfoEditIconPickerSelectedBorderWidth = 2.5.dp
 
@@ -124,27 +122,28 @@ private fun DogInfoEditIconPickerSection(
                 .fillMaxWidth()
                 .padding(top = DogInfoEditIconLabelToPickerTopPadding),
         ) {
-            val itemSize =
-                (maxWidth - DogInfoEditIconPickerItemSpacing * (DogInfoEditIconPickerColumnCount - 1)) /
-                    DogInfoEditIconPickerColumnCount
+            val itemSize = minOf(
+                DogInfoEditIconPickerItemSize,
+                maxWidth / DogInfoEditIconPickerColumnCount,
+            )
             Column(
-                verticalArrangement = Arrangement.spacedBy(DogInfoEditIconPickerRowSpacing),
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 selectablePetIconRes.chunked(DogInfoEditIconPickerColumnCount).forEach { rowIcons ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(DogInfoEditIconPickerItemSpacing),
-                    ) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
                         rowIcons.forEach { iconRes ->
-                            DogInfoEditIconPickerItem(
-                                iconRes = iconRes,
-                                itemSize = itemSize,
-                                isSelected = iconRes == selectedPetIconRes,
-                                onClick = { onPetIconSelect(iconRes) },
-                            )
-                        }
-                        repeat(DogInfoEditIconPickerColumnCount - rowIcons.size) {
-                            Spacer(Modifier.size(itemSize))
+                            Box(
+                                modifier = Modifier.weight(1f),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                DogInfoEditIconPickerItem(
+                                    iconRes = iconRes,
+                                    itemSize = itemSize,
+                                    isSelected = iconRes == selectedPetIconRes,
+                                    onClick = { onPetIconSelect(iconRes) },
+                                )
+                            }
                         }
                     }
                 }
