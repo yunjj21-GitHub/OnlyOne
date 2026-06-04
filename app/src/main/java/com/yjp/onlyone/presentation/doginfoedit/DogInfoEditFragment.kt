@@ -36,8 +36,10 @@ class DogInfoEditFragment : BaseFragment<FragmentDogInfoEditBinding>() {
         super.onViewCreated(view, savedInstanceState)
         binding.dogInfoEditComposeView.setThemeContent {
             val petIconRes by viewModel.petIconRes.collectAsStateWithLifecycle()
+            val petName by viewModel.petName.collectAsStateWithLifecycle()
             DogInfoEditScreen(
                 petIconRes = petIconRes,
+                petName = petName,
                 onBackClick = viewModel::onBackClick,
                 onSaveClick = viewModel::onSaveClick,
                 onPetIconSelect = viewModel::onPetIconSelect,

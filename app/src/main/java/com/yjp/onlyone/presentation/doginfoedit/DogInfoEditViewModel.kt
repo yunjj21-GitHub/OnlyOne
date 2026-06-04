@@ -22,6 +22,9 @@ class DogInfoEditViewModel @Inject constructor() : ViewModel() {
     private val _petIconRes = MutableStateFlow(HomeViewModel.DEFAULT_PET_ICON_RES)
     val petIconRes: StateFlow<Int> = _petIconRes.asStateFlow()
 
+    private val _petName = MutableStateFlow(HomeViewModel.DEFAULT_PET_NAME)
+    val petName: StateFlow<String> = _petName.asStateFlow()
+
     private val _navigationEvent = MutableSharedFlow<DogInfoEditNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<DogInfoEditNavigation> = _navigationEvent.asSharedFlow()
 
