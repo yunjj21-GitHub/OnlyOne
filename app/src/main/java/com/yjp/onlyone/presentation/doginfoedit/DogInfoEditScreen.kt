@@ -49,6 +49,9 @@ import com.yjp.onlyone.R
 import com.yjp.onlyone.presentation.home.HomeViewModel
 import com.yjp.onlyone.ui.modifier.dogInfoPetIconShadow
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
+import com.yjp.onlyone.ui.dialog.PastOrTodayDatePickerDialog
+import com.yjp.onlyone.util.formatDotSeparated
+import java.time.LocalDate
 
 private val DogInfoEditTopBarTopPadding = 10.dp
 private val DogInfoEditTopBarHorizontalPadding = 10.dp
@@ -78,11 +81,15 @@ private val DogInfoEditScrollBottomPadding = 24.dp
 fun DogInfoEditScreen(
     @DrawableRes petIconRes: Int = HomeViewModel.DEFAULT_PET_ICON_RES,
     petName: String = HomeViewModel.DEFAULT_PET_NAME,
-    adoptionDate: String = DogInfoEditViewModel.DEFAULT_ADOPTION_DATE,
+    adoptionDate: LocalDate = DogInfoEditViewModel.DEFAULT_ADOPTION_DATE,
     selectablePetIconRes: List<Int> = DogInfoEditViewModel.SELECTABLE_PET_ICON_RES,
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {},
     onPetIconSelect: (Int) -> Unit = {},
+    isDatePickerVisible: Boolean = false,
+    onCalendarClick: () -> Unit = {},
+    onDatePickerDismiss: () -> Unit = {},
+    onAdoptionDateSelected: (LocalDate) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val topBarTextStyle = MaterialTheme.typography.titleLarge.copy(
@@ -124,8 +131,18 @@ fun DogInfoEditScreen(
                 topBarTextStyle = topBarTextStyle,
                 petName = petName,
                 adoptionDate = adoptionDate,
+                onCalendarClick = onCalendarClick,
             )
         }
+    }
+
+    if (isDatePickerVisible) {
+        PastOrTodayDatePickerDialog(
+            initialDate = adoptionDate,
+            onDismissRequest = onDatePickerDismiss,
+            onCancel = onDatePickerDismiss,
+            onConfirm = onAdoptionDateSelected,
+        )
     }
 }
 
@@ -189,10 +206,10 @@ private fun DogInfoEditIconPickerSection(
 private fun DogInfoEditPetFormSection(
     topBarTextStyle: TextStyle,
     petName: String,
-    adoptionDate: String,
+    adoptionDate: LocalDate,
+    onCalendarClick: () -> Unit,
 ) {
     var petNameInput by remember(petName) { mutableStateOf(petName) }
-    var adoptionDateInput by remember(adoptionDate) { mutableStateOf(adoptionDate) }
 
     Column(
         modifier = Modifier
@@ -211,8 +228,8 @@ private fun DogInfoEditPetFormSection(
         )
         DogInfoEditLabeledAdoptionDateField(
             label = stringResource(R.string.dog_info_edit_adoption_date_label),
-            value = adoptionDateInput,
-            onValueChange = { adoptionDateInput = it },
+            adoptionDate = adoptionDate,
+            onCalendarClick = onCalendarClick,
             labelStyle = topBarTextStyle,
             modifier = Modifier.padding(top = DogInfoEditFormFieldGroupTopPadding),
         )
@@ -242,8 +259,8 @@ private fun DogInfoEditLabeledTextField(
 @Composable
 private fun DogInfoEditLabeledAdoptionDateField(
     label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
+    adoptionDate: LocalDate,
+    onCalendarClick: () -> Unit,
     labelStyle: TextStyle,
     modifier: Modifier = Modifier,
 ) {
@@ -252,9 +269,9 @@ private fun DogInfoEditLabeledAdoptionDateField(
         labelStyle = labelStyle,
         modifier = modifier,
     ) {
-        DogInfoEditAdoptionDateBorderedTextField(
-            value = value,
-            onValueChange = onValueChange,
+        DogInfoEditAdoptionDateField(
+            adoptionDate = adoptionDate,
+            onCalendarClick = onCalendarClick,
         )
     }
 }
@@ -316,9 +333,9 @@ private fun DogInfoEditBorderedTextField(
 }
 
 @Composable
-private fun DogInfoEditAdoptionDateBorderedTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
+private fun DogInfoEditAdoptionDateField(
+    adoptionDate: LocalDate,
+    onCalendarClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val fieldShape = RoundedCornerShape(DogInfoEditFormFieldCornerRadius)
@@ -338,9 +355,8 @@ private fun DogInfoEditAdoptionDateBorderedTextField(
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
+        Text(
+            text = adoptionDate.formatDotSeparated(),
             modifier = Modifier
                 .weight(1f)
                 .padding(
@@ -348,12 +364,10 @@ private fun DogInfoEditAdoptionDateBorderedTextField(
                     top = DogInfoEditFormFieldContentPadding,
                     bottom = DogInfoEditFormFieldContentPadding,
                 ),
-            textStyle = fieldTextStyle,
-            cursorBrush = SolidColor(fieldBorderColor),
-            singleLine = true,
+            style = fieldTextStyle,
         )
         DogInfoEditCalendarButton(
-            onClick = {},
+            onClick = onCalendarClick,
             iconHeight = calendarIconHeight,
             modifier = Modifier.padding(DogInfoEditFormFieldContentPadding),
         )

@@ -38,6 +38,7 @@ class DogInfoEditFragment : BaseFragment<FragmentDogInfoEditBinding>() {
             val petIconRes by viewModel.petIconRes.collectAsStateWithLifecycle()
             val petName by viewModel.petName.collectAsStateWithLifecycle()
             val adoptionDate by viewModel.adoptionDate.collectAsStateWithLifecycle()
+            val isDatePickerVisible by viewModel.isDatePickerVisible.collectAsStateWithLifecycle()
             DogInfoEditScreen(
                 petIconRes = petIconRes,
                 petName = petName,
@@ -45,6 +46,10 @@ class DogInfoEditFragment : BaseFragment<FragmentDogInfoEditBinding>() {
                 onBackClick = viewModel::onBackClick,
                 onSaveClick = viewModel::onSaveClick,
                 onPetIconSelect = viewModel::onPetIconSelect,
+                isDatePickerVisible = isDatePickerVisible,
+                onCalendarClick = viewModel::onCalendarClick,
+                onDatePickerDismiss = viewModel::onDatePickerDismiss,
+                onAdoptionDateSelected = viewModel::onAdoptionDateSelected,
             )
         }
         viewLifecycleOwner.lifecycleScope.launch {

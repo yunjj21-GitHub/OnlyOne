@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yjp.onlyone.R
 import com.yjp.onlyone.presentation.home.HomeViewModel
+import com.yjp.onlyone.util.localDateOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,7 +28,10 @@ class DogInfoEditViewModel @Inject constructor() : ViewModel() {
     val petName: StateFlow<String> = _petName.asStateFlow()
 
     private val _adoptionDate = MutableStateFlow(DEFAULT_ADOPTION_DATE)
-    val adoptionDate: StateFlow<String> = _adoptionDate.asStateFlow()
+    val adoptionDate: StateFlow<LocalDate> = _adoptionDate.asStateFlow()
+
+    private val _isDatePickerVisible = MutableStateFlow(false)
+    val isDatePickerVisible: StateFlow<Boolean> = _isDatePickerVisible.asStateFlow()
 
     private val _navigationEvent = MutableSharedFlow<DogInfoEditNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<DogInfoEditNavigation> = _navigationEvent.asSharedFlow()
@@ -47,8 +52,21 @@ class DogInfoEditViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun onCalendarClick() {
+        _isDatePickerVisible.value = true
+    }
+
+    fun onDatePickerDismiss() {
+        _isDatePickerVisible.value = false
+    }
+
+    fun onAdoptionDateSelected(date: LocalDate) {
+        _adoptionDate.value = date
+        _isDatePickerVisible.value = false
+    }
+
     companion object {
-        const val DEFAULT_ADOPTION_DATE = "2019.02.04"
+        val DEFAULT_ADOPTION_DATE: LocalDate = localDateOf(2019, 2, 4)
 
         val SELECTABLE_PET_ICON_RES: List<Int> = listOf(
             R.drawable.ic_dog1,
