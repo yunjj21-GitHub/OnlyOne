@@ -36,13 +36,13 @@ import com.yjp.onlyone.ui.theme.OnlyOneTheme
 private val MemoTopBarTopPadding = 10.dp
 private val MemoTopBarHorizontalPadding = 10.dp
 private val MemoTopBarSideMinWidth = 48.dp
-private val MemoBackButtonSize = 48.dp
+private val MemoBackButtonSize = 44.dp
 private val MemoSaveEndPadding = 16.dp
 private val MemoPaperCornerRadius = 28.dp
 private val MemoPaperHorizontalPadding = 20.dp
-private val MemoPaperTopPadding = 8.dp
-private val MemoPaperBottomPadding = 16.dp
-private val MemoPaperContentPadding = 16.dp
+private val MemoPaperTopPadding = 20.dp
+private val MemoPaperBottomPadding = 20.dp
+private val MemoPaperContentPadding = 20.dp
 
 @Composable
 fun MemoScreen(
@@ -57,8 +57,11 @@ fun MemoScreen(
         fontWeight = FontWeight.Bold,
         color = colorResource(R.color.black),
     )
-    val memoInputTextStyle = MaterialTheme.typography.titleMedium.copy(
+    val memoInputTextStyle = MaterialTheme.typography.titleLarge.copy(
         color = colorResource(R.color.black),
+    )
+    val memoHintTextStyle = memoInputTextStyle.copy(
+        color = colorResource(R.color.memo_input_hint),
     )
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -139,6 +142,17 @@ fun MemoScreen(
                         .verticalScroll(rememberScrollState()),
                     textStyle = memoInputTextStyle,
                     cursorBrush = SolidColor(colorResource(R.color.black)),
+                    decorationBox = { innerTextField ->
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            if (memoContent.isEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.memo_input_hint),
+                                    style = memoHintTextStyle,
+                                )
+                            }
+                            innerTextField()
+                        }
+                    },
                 )
             }
         }
