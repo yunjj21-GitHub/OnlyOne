@@ -38,7 +38,7 @@ import com.yjp.onlyone.R
 import com.yjp.onlyone.ui.modifier.homeHappinessCardShadow
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
-private val PetProgressRingSize = 220.dp
+private val PetProgressRingSize = 210.dp
 private val PetTextSizeReduce = 2.sp
 private val HomeContentPanelCornerRadius = 14.dp
 private val HomeContentPanelContentPadding = 20.dp
@@ -84,15 +84,11 @@ fun HomeScreen(
     val togetherDaysText = remember(daysTogether) {
         HomeViewModel.buildTogetherDaysText(daysTogether)
     }
-    val headlineMedium = MaterialTheme.typography.headlineMedium
-    val baseFontSizeValue = headlineMedium.fontSize.value
-    val petNameStyle = headlineMedium.copy(
-        fontSize = baseFontSizeValue.sp,
+    val petNameStyle = MaterialTheme.typography.headlineLarge.copy(
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,
     )
-    val togetherDaysStyle = headlineMedium.copy(
-        fontSize = (baseFontSizeValue - PetTextSizeReduce.value).sp,
+    val togetherDaysStyle = MaterialTheme.typography.headlineMedium.copy(
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,
     )
@@ -138,7 +134,6 @@ fun HomeScreen(
             Box(contentAlignment = Alignment.TopCenter) {
                 Box(
                     modifier = Modifier
-                        .padding(top = 14.dp)
                         .size(PetProgressRingSize),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -161,7 +156,7 @@ fun HomeScreen(
             }
             Text(
                 text = togetherDaysText,
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = 10.dp),
                 style = togetherDaysStyle,
             )
             HomeContentPanel(
