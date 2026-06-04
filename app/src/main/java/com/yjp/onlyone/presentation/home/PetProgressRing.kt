@@ -54,5 +54,15 @@ fun PetProgressRing(
                 style = Stroke(width = strokePx, cap = StrokeCap.Round),
             )
         }
+
+        val arcRadius = diameter / 2f
+        drawCircle(
+            color = primaryColor,
+            radius = strokePx / 2f,
+            center = Offset(
+                x = center.x,
+                y = center.y - arcRadius,
+            ),
+        )
     }
 }
