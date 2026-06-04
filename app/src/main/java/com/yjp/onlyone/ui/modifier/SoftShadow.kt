@@ -21,9 +21,18 @@ fun Modifier.softShadow(
     spotColor = SoftShadowSpotColor,
 )
 
+private val HomeHappinessCardShadowElevation = 22.dp
+private val HomeHappinessCardShadowAmbientColor = Color(0x73000000)
+private val HomeHappinessCardShadowSpotColor = Color(0x8A000000)
+
 fun Modifier.homeHappinessCardShadow(
     shape: Shape = RoundedCornerShape(14.dp),
-): Modifier = softShadow(shape)
+): Modifier = shadow(
+    elevation = HomeHappinessCardShadowElevation,
+    shape = shape,
+    ambientColor = HomeHappinessCardShadowAmbientColor,
+    spotColor = HomeHappinessCardShadowSpotColor,
+)
 
 fun Modifier.dogInfoPetIconShadow(
     shape: Shape = CircleShape,
