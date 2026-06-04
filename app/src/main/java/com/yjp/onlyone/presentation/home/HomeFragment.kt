@@ -32,6 +32,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         binding.viewModel = viewModel
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadPetInfo()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.homeComposeView.setThemeContent {

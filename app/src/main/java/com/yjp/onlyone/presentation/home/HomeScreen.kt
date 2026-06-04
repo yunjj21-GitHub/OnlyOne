@@ -73,7 +73,7 @@ fun HomeScreen(
     petName: String,
     @DrawableRes petIconRes: Int = R.drawable.ic_dog1,
     happinessIndex: Int = HomeViewModel.DEFAULT_HAPPINESS_INDEX,
-    daysTogether: Int = HomeViewModel.DEFAULT_DAYS_TOGETHER,
+    daysTogether: Int = 0,
     onMemoClick: () -> Unit = {},
     onDogInfoEditClick: () -> Unit = {},
     modifier: Modifier = Modifier,
@@ -298,10 +298,10 @@ private fun HomeTopIconButton(
 private fun HomeScreenPreview() {
     OnlyOneTheme {
         HomeScreen(
-            petName = HomeViewModel.DEFAULT_PET_NAME,
+            petName = "내새꾸",
             petIconRes = HomeViewModel.DEFAULT_PET_ICON_RES,
             happinessIndex = HomeViewModel.DEFAULT_HAPPINESS_INDEX,
-            daysTogether = HomeViewModel.DEFAULT_DAYS_TOGETHER,
+            daysTogether = 0,
         )
     }
 }

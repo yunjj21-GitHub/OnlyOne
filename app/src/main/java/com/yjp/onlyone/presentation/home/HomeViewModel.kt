@@ -1,10 +1,14 @@
 package com.yjp.onlyone.presentation.home
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yjp.onlyone.R
+import com.yjp.onlyone.domain.repository.PetRepository
+import com.yjp.onlyone.util.daysFromToToday
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,23 +21,39 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val petRepository: PetRepository,
+    @ApplicationContext context: Context,
+) : ViewModel() {
 
-    private val _petName = MutableStateFlow(DEFAULT_PET_NAME)
+    private val _petName = MutableStateFlow(context.getString(R.string.pet_name_default))
     val petName: StateFlow<String> = _petName.asStateFlow()
 
     @DrawableRes
-    private val _petIconRes = MutableStateFlow(DEFAULT_PET_ICON_RES)
+    private val _petIconRes = MutableStateFlow(R.drawable.ic_dog1)
     val petIconRes: StateFlow<Int> = _petIconRes.asStateFlow()
 
     private val _happinessIndex = MutableStateFlow(DEFAULT_HAPPINESS_INDEX)
     val happinessIndex: StateFlow<Int> = _happinessIndex.asStateFlow()
 
-    private val _daysTogether = MutableStateFlow(DEFAULT_DAYS_TOGETHER)
+    private val _daysTogether = MutableStateFlow(0)
     val daysTogether: StateFlow<Int> = _daysTogether.asStateFlow()
 
     private val _navigationEvent = MutableSharedFlow<HomeNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<HomeNavigation> = _navigationEvent.asSharedFlow()
+
+    init {
+        loadPetInfo()
+    }
+
+    fun loadPetInfo() {
+        viewModelScope.launch {
+            val petInfo = petRepository.getPetInfo()
+            _petIconRes.value = petInfo.iconRes
+            _petName.value = petInfo.name
+            _daysTogether.value = daysFromToToday(petInfo.adoptionDate)
+        }
+    }
 
     fun onMemoClick() {
         viewModelScope.launch {
@@ -47,28 +67,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun updatePetName(name: String) {
-        _petName.value = name
-    }
-
-    fun updatePetIcon(@DrawableRes iconRes: Int) {
-        _petIconRes.value = iconRes
-    }
-
-    fun updateHappinessIndex(index: Int) {
-        _happinessIndex.value = index.coerceIn(HAPPINESS_INDEX_MIN, HAPPINESS_INDEX_MAX)
-    }
-
-    fun updateDaysTogether(days: Int) {
-        _daysTogether.value = days.coerceAtLeast(0)
-    }
-
     companion object {
         const val HAPPINESS_INDEX_MIN = 0
         const val HAPPINESS_INDEX_MAX = 100
-        const val DEFAULT_PET_NAME = "내새꾸"
         const val DEFAULT_HAPPINESS_INDEX = 55
-        const val DEFAULT_DAYS_TOGETHER = 1004
 
         @DrawableRes
         val DEFAULT_PET_ICON_RES: Int = R.drawable.ic_dog1
@@ -78,11 +80,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         }
 
         fun formatDaysTogether(days: Int): String {
-            return if (days >= 1000) {
-                NumberFormat.getNumberInstance(Locale.KOREA).format(days)
-            } else {
-                days.toString()
-            }
+            return NumberFormat.getNumberInstance(Locale.KOREA).format(days)
         }
 
         fun buildTogetherDaysText(days: Int): String {

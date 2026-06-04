@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SelectableDates
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
@@ -25,6 +26,14 @@ object PastOrTodaySelectableDates : SelectableDates {
 
 fun localDateOf(year: Int, month: Int, dayOfMonth: Int): LocalDate {
     return LocalDate.of(year, month, dayOfMonth)
+}
+
+/** [fromDate]부터 [toDate]까지 경과 일 수(당일=0). 기본 [toDate]는 기기 오늘. */
+fun daysFromToToday(
+    fromDate: LocalDate,
+    toDate: LocalDate = todayLocalDate(),
+): Int {
+    return ChronoUnit.DAYS.between(fromDate, toDate).toInt().coerceAtLeast(0)
 }
 
 fun todayLocalDate(): LocalDate {
