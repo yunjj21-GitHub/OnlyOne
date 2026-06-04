@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -28,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
@@ -196,7 +198,7 @@ private fun DogInfoEditPetFormSection(
             onValueChange = { petNameInput = it },
             labelStyle = topBarTextStyle,
         )
-        DogInfoEditLabeledTextField(
+        DogInfoEditLabeledAdoptionDateField(
             label = stringResource(R.string.dog_info_edit_adoption_date_label),
             value = adoptionDateInput,
             onValueChange = { adoptionDateInput = it },
@@ -214,18 +216,65 @@ private fun DogInfoEditLabeledTextField(
     labelStyle: TextStyle,
     modifier: Modifier = Modifier,
 ) {
+    DogInfoEditLabeledField(
+        label = label,
+        labelStyle = labelStyle,
+        modifier = modifier,
+    ) {
+        DogInfoEditBorderedTextField(
+            value = value,
+            onValueChange = onValueChange,
+        )
+    }
+}
+
+@Composable
+private fun DogInfoEditLabeledAdoptionDateField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    labelStyle: TextStyle,
+    modifier: Modifier = Modifier,
+) {
+    DogInfoEditLabeledField(
+        label = label,
+        labelStyle = labelStyle,
+        modifier = modifier,
+    ) {
+        DogInfoEditAdoptionDateBorderedTextField(
+            value = value,
+            onValueChange = onValueChange,
+        )
+    }
+}
+
+@Composable
+private fun DogInfoEditLabeledField(
+    label: String,
+    labelStyle: TextStyle,
+    modifier: Modifier = Modifier,
+    field: @Composable () -> Unit,
+) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label,
             modifier = Modifier.fillMaxWidth(),
             style = labelStyle,
         )
-        DogInfoEditBorderedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.padding(top = DogInfoEditFormLabelToFieldTopPadding),
-        )
+        Box(modifier = Modifier.padding(top = DogInfoEditFormLabelToFieldTopPadding)) {
+            field()
+        }
     }
+}
+
+@Composable
+private fun DogInfoEditFormFieldTextStyle(): TextStyle {
+    return MaterialTheme.typography.titleLarge.copy(
+        fontWeight = FontWeight.Normal,
+        color = colorResource(R.color.black),
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+    )
 }
 
 @Composable
@@ -235,12 +284,8 @@ private fun DogInfoEditBorderedTextField(
     modifier: Modifier = Modifier,
 ) {
     val fieldShape = RoundedCornerShape(DogInfoEditFormFieldCornerRadius)
-    val fieldTextStyle = MaterialTheme.typography.titleLarge.copy(
-        fontWeight = FontWeight.Normal,
-        color = colorResource(R.color.black),
-        fontSize = 18.sp,
-        lineHeight = 24.sp,
-    )
+    val fieldTextStyle = DogInfoEditFormFieldTextStyle()
+    val fieldBorderColor = colorResource(R.color.black)
 
     BasicTextField(
         value = value,
@@ -249,14 +294,82 @@ private fun DogInfoEditBorderedTextField(
             .fillMaxWidth()
             .border(
                 width = DogInfoEditFormFieldBorderWidth,
-                color = colorResource(R.color.black),
+                color = fieldBorderColor,
                 shape = fieldShape,
             )
             .padding(DogInfoEditFormFieldContentPadding),
         textStyle = fieldTextStyle,
-        cursorBrush = SolidColor(colorResource(R.color.black)),
+        cursorBrush = SolidColor(fieldBorderColor),
         singleLine = true,
     )
+}
+
+@Composable
+private fun DogInfoEditAdoptionDateBorderedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val fieldShape = RoundedCornerShape(DogInfoEditFormFieldCornerRadius)
+    val fieldTextStyle = DogInfoEditFormFieldTextStyle()
+    val fieldBorderColor = colorResource(R.color.black)
+    val calendarIconHeight = with(LocalDensity.current) {
+        fieldTextStyle.lineHeight.toDp()
+    }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = DogInfoEditFormFieldBorderWidth,
+                color = fieldBorderColor,
+                shape = fieldShape,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .weight(1f)
+                .padding(
+                    start = DogInfoEditFormFieldContentPadding,
+                    top = DogInfoEditFormFieldContentPadding,
+                    bottom = DogInfoEditFormFieldContentPadding,
+                ),
+            textStyle = fieldTextStyle,
+            cursorBrush = SolidColor(fieldBorderColor),
+            singleLine = true,
+        )
+        DogInfoEditCalendarButton(
+            onClick = {},
+            iconHeight = calendarIconHeight,
+            modifier = Modifier.padding(DogInfoEditFormFieldContentPadding),
+        )
+    }
+}
+
+@Composable
+private fun DogInfoEditCalendarButton(
+    onClick: () -> Unit,
+    iconHeight: Dp,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onClick,
+        ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(
+            painter = painterResource(R.drawable.ic_calendar),
+            contentDescription = null,
+            modifier = Modifier.height(iconHeight),
+            contentScale = ContentScale.Fit,
+        )
+    }
 }
 
 @Composable
