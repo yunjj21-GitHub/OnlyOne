@@ -25,6 +25,9 @@ class DogInfoEditViewModel @Inject constructor() : ViewModel() {
     private val _petName = MutableStateFlow(HomeViewModel.DEFAULT_PET_NAME)
     val petName: StateFlow<String> = _petName.asStateFlow()
 
+    private val _adoptionDate = MutableStateFlow(DEFAULT_ADOPTION_DATE)
+    val adoptionDate: StateFlow<String> = _adoptionDate.asStateFlow()
+
     private val _navigationEvent = MutableSharedFlow<DogInfoEditNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<DogInfoEditNavigation> = _navigationEvent.asSharedFlow()
 
@@ -45,6 +48,8 @@ class DogInfoEditViewModel @Inject constructor() : ViewModel() {
     }
 
     companion object {
+        const val DEFAULT_ADOPTION_DATE = "2019.02.04"
+
         val SELECTABLE_PET_ICON_RES: List<Int> = listOf(
             R.drawable.ic_dog1,
             R.drawable.ic_dog19,

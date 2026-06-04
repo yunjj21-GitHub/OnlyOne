@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.yjp.onlyone.R
 import com.yjp.onlyone.presentation.home.HomeViewModel
 import com.yjp.onlyone.ui.modifier.dogInfoPetIconShadow
@@ -61,16 +62,18 @@ private val DogInfoEditIconPickerItemSize = 70.dp
 private val DogInfoEditIconPickerItemInnerPadding = 2.dp
 private val DogInfoEditIconPickerUnselectedBorderWidth = 0.4.dp
 private val DogInfoEditIconPickerSelectedBorderWidth = 2.5.dp
-private val DogInfoEditNameSectionTopPadding = 20.dp
-private val DogInfoEditNameLabelToFieldTopPadding = 10.dp
-private val DogInfoEditNameFieldCornerRadius = 12.dp
-private val DogInfoEditNameFieldBorderWidth = 1.dp
-private val DogInfoEditNameFieldContentPadding = 14.dp
+private val DogInfoEditFormSectionTopPadding = 20.dp
+private val DogInfoEditFormFieldGroupTopPadding = 20.dp
+private val DogInfoEditFormLabelToFieldTopPadding = 10.dp
+private val DogInfoEditFormFieldCornerRadius = 12.dp
+private val DogInfoEditFormFieldBorderWidth = 1.dp
+private val DogInfoEditFormFieldContentPadding = 14.dp
 
 @Composable
 fun DogInfoEditScreen(
     @DrawableRes petIconRes: Int = HomeViewModel.DEFAULT_PET_ICON_RES,
     petName: String = HomeViewModel.DEFAULT_PET_NAME,
+    adoptionDate: String = DogInfoEditViewModel.DEFAULT_ADOPTION_DATE,
     selectablePetIconRes: List<Int> = DogInfoEditViewModel.SELECTABLE_PET_ICON_RES,
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {},
@@ -105,9 +108,10 @@ fun DogInfoEditScreen(
             selectedPetIconRes = petIconRes,
             onPetIconSelect = onPetIconSelect,
         )
-        DogInfoEditPetNameSection(
+        DogInfoEditPetFormSection(
             topBarTextStyle = topBarTextStyle,
             petName = petName,
+            adoptionDate = adoptionDate,
         )
     }
 }
@@ -169,48 +173,90 @@ private fun DogInfoEditIconPickerSection(
 }
 
 @Composable
-private fun DogInfoEditPetNameSection(
+private fun DogInfoEditPetFormSection(
     topBarTextStyle: TextStyle,
     petName: String,
+    adoptionDate: String,
 ) {
-    val nameFieldShape = RoundedCornerShape(DogInfoEditNameFieldCornerRadius)
-    val nameFieldTextStyle = MaterialTheme.typography.titleLarge.copy(
-        fontWeight = FontWeight.Normal,
-        color = colorResource(R.color.black),
-    )
     var petNameInput by remember(petName) { mutableStateOf(petName) }
+    var adoptionDateInput by remember(adoptionDate) { mutableStateOf(adoptionDate) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                top = DogInfoEditNameSectionTopPadding,
+                top = DogInfoEditFormSectionTopPadding,
                 start = DogInfoEditIconSectionHorizontalPadding,
                 end = DogInfoEditIconSectionHorizontalPadding,
             ),
     ) {
-        Text(
-            text = stringResource(R.string.dog_info_edit_name_label),
-            modifier = Modifier.fillMaxWidth(),
-            style = topBarTextStyle,
-        )
-        BasicTextField(
+        DogInfoEditLabeledTextField(
+            label = stringResource(R.string.dog_info_edit_name_label),
             value = petNameInput,
             onValueChange = { petNameInput = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = DogInfoEditNameLabelToFieldTopPadding)
-                .border(
-                    width = DogInfoEditNameFieldBorderWidth,
-                    color = colorResource(R.color.black),
-                    shape = nameFieldShape,
-                )
-                .padding(DogInfoEditNameFieldContentPadding),
-            textStyle = nameFieldTextStyle,
-            cursorBrush = SolidColor(colorResource(R.color.black)),
-            singleLine = true,
+            labelStyle = topBarTextStyle,
+        )
+        DogInfoEditLabeledTextField(
+            label = stringResource(R.string.dog_info_edit_adoption_date_label),
+            value = adoptionDateInput,
+            onValueChange = { adoptionDateInput = it },
+            labelStyle = topBarTextStyle,
+            modifier = Modifier.padding(top = DogInfoEditFormFieldGroupTopPadding),
         )
     }
+}
+
+@Composable
+private fun DogInfoEditLabeledTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    labelStyle: TextStyle,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            modifier = Modifier.fillMaxWidth(),
+            style = labelStyle,
+        )
+        DogInfoEditBorderedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.padding(top = DogInfoEditFormLabelToFieldTopPadding),
+        )
+    }
+}
+
+@Composable
+private fun DogInfoEditBorderedTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val fieldShape = RoundedCornerShape(DogInfoEditFormFieldCornerRadius)
+    val fieldTextStyle = MaterialTheme.typography.titleLarge.copy(
+        fontWeight = FontWeight.Normal,
+        color = colorResource(R.color.black),
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+    )
+
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = DogInfoEditFormFieldBorderWidth,
+                color = colorResource(R.color.black),
+                shape = fieldShape,
+            )
+            .padding(DogInfoEditFormFieldContentPadding),
+        textStyle = fieldTextStyle,
+        cursorBrush = SolidColor(colorResource(R.color.black)),
+        singleLine = true,
+    )
 }
 
 @Composable
