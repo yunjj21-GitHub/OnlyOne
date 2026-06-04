@@ -4,7 +4,9 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,6 +72,7 @@ private val DogInfoEditFormLabelToFieldTopPadding = 8.dp
 private val DogInfoEditFormFieldCornerRadius = 12.dp
 private val DogInfoEditFormFieldBorderWidth = 1.dp
 private val DogInfoEditFormFieldContentPadding = 14.dp
+private val DogInfoEditScrollBottomPadding = 24.dp
 
 @Composable
 fun DogInfoEditScreen(
@@ -87,34 +90,42 @@ fun DogInfoEditScreen(
         color = colorResource(R.color.black),
     )
 
-    Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    val scrollState = rememberScrollState()
+
+    Column(modifier = modifier.fillMaxSize()) {
         DogInfoEditTitleBar(
             topBarTextStyle = topBarTextStyle,
             onBackClick = onBackClick,
             onSaveClick = onSaveClick,
         )
-        Box(
+        Column(
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
-                .padding(top = DogInfoEditPetIconAreaTopPadding),
-            contentAlignment = Alignment.TopCenter,
+                .verticalScroll(scrollState)
+                .padding(bottom = DogInfoEditScrollBottomPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            DogInfoEditPetIconView(petIconRes = petIconRes)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = DogInfoEditPetIconAreaTopPadding),
+                contentAlignment = Alignment.TopCenter,
+            ) {
+                DogInfoEditPetIconView(petIconRes = petIconRes)
+            }
+            DogInfoEditIconPickerSection(
+                topBarTextStyle = topBarTextStyle,
+                selectablePetIconRes = selectablePetIconRes,
+                selectedPetIconRes = petIconRes,
+                onPetIconSelect = onPetIconSelect,
+            )
+            DogInfoEditPetFormSection(
+                topBarTextStyle = topBarTextStyle,
+                petName = petName,
+                adoptionDate = adoptionDate,
+            )
         }
-        DogInfoEditIconPickerSection(
-            topBarTextStyle = topBarTextStyle,
-            selectablePetIconRes = selectablePetIconRes,
-            selectedPetIconRes = petIconRes,
-            onPetIconSelect = onPetIconSelect,
-        )
-        DogInfoEditPetFormSection(
-            topBarTextStyle = topBarTextStyle,
-            petName = petName,
-            adoptionDate = adoptionDate,
-        )
     }
 }
 
