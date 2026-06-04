@@ -1,4 +1,4 @@
-package com.yjp.onlyone.presentation.home
+package com.yjp.onlyone.ui.component
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.yjp.onlyone.ui.theme.PrimaryBlue
 
 @Composable
-fun PetProgressRing(
+fun SkyBlueGradientProgressRing(
     progress: Float,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = 14.dp,

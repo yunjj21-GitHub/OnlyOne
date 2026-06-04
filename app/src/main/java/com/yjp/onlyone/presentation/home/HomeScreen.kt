@@ -35,10 +35,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yjp.onlyone.R
+import com.yjp.onlyone.ui.component.SkyBlueGradientProgressRing
 import com.yjp.onlyone.ui.modifier.homeHappinessCardShadow
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
-private val PetProgressRingSize = 210.dp
+private val HomePetProgressRingSize = 210.dp
 private val PetTextSizeReduce = 2.sp
 private val HomeContentPanelCornerRadius = 14.dp
 private val HomeContentPanelContentPadding = 20.dp
@@ -134,10 +135,10 @@ fun HomeScreen(
             Box(contentAlignment = Alignment.TopCenter) {
                 Box(
                     modifier = Modifier
-                        .size(PetProgressRingSize),
+                        .size(HomePetProgressRingSize),
                     contentAlignment = Alignment.Center,
                 ) {
-                    PetProgressRing(
+                    SkyBlueGradientProgressRing(
                         progress = happinessProgress,
                         modifier = Modifier.fillMaxSize(),
                     )
