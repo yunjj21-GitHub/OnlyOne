@@ -27,6 +27,19 @@ fun localDateOf(year: Int, month: Int, dayOfMonth: Int): LocalDate {
     return LocalDate.of(year, month, dayOfMonth)
 }
 
+fun todayLocalDate(): LocalDate {
+    val today = Calendar.getInstance()
+    return localDateOf(
+        today.get(Calendar.YEAR),
+        today.get(Calendar.MONTH) + 1,
+        today.get(Calendar.DAY_OF_MONTH),
+    )
+}
+
+fun LocalDate.toEpochDayValue(): Long = toEpochDay()
+
+fun Long.toLocalDateFromEpochDay(): LocalDate = LocalDate.ofEpochDay(this)
+
 fun LocalDate.toUtcPickerMillis(): Long {
     return yearMonthDayToUtcPickerMillis(year, monthValue, dayOfMonth)
 }

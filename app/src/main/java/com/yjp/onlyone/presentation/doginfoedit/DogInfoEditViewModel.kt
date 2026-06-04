@@ -1,12 +1,15 @@
 package com.yjp.onlyone.presentation.doginfoedit
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yjp.onlyone.R
-import com.yjp.onlyone.presentation.home.HomeViewModel
-import com.yjp.onlyone.util.localDateOf
+import com.yjp.onlyone.domain.model.PetInfo
+import com.yjp.onlyone.domain.repository.PetRepository
+import com.yjp.onlyone.util.todayLocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -18,16 +21,19 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class DogInfoEditViewModel @Inject constructor() : ViewModel() {
+class DogInfoEditViewModel @Inject constructor(
+    private val petRepository: PetRepository,
+    @ApplicationContext context: Context,
+) : ViewModel() {
 
     @DrawableRes
-    private val _petIconRes = MutableStateFlow(HomeViewModel.DEFAULT_PET_ICON_RES)
+    private val _petIconRes = MutableStateFlow(R.drawable.ic_dog1)
     val petIconRes: StateFlow<Int> = _petIconRes.asStateFlow()
 
-    private val _petName = MutableStateFlow(HomeViewModel.DEFAULT_PET_NAME)
+    private val _petName = MutableStateFlow(context.getString(R.string.pet_name_default))
     val petName: StateFlow<String> = _petName.asStateFlow()
 
-    private val _adoptionDate = MutableStateFlow(DEFAULT_ADOPTION_DATE)
+    private val _adoptionDate = MutableStateFlow(todayLocalDate())
     val adoptionDate: StateFlow<LocalDate> = _adoptionDate.asStateFlow()
 
     private val _isDatePickerVisible = MutableStateFlow(false)
@@ -36,6 +42,22 @@ class DogInfoEditViewModel @Inject constructor() : ViewModel() {
     private val _navigationEvent = MutableSharedFlow<DogInfoEditNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<DogInfoEditNavigation> = _navigationEvent.asSharedFlow()
 
+    init {
+        loadPetInfo()
+    }
+
+    private fun loadPetInfo() {
+        viewModelScope.launch {
+            applyPetInfo(petRepository.getPetInfo())
+        }
+    }
+
+    private fun applyPetInfo(petInfo: PetInfo) {
+        _petIconRes.value = petInfo.iconRes
+        _petName.value = petInfo.name
+        _adoptionDate.value = petInfo.adoptionDate
+    }
+
     fun onBackClick() {
         viewModelScope.launch {
             _navigationEvent.emit(DogInfoEditNavigation.ToHome)
@@ -43,7 +65,13 @@ class DogInfoEditViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onSaveClick() {
-        // TODO: persist dog info
+        viewModelScope.launch {
+            petRepository.savePetInfo(currentPetInfo())
+        }
+    }
+
+    fun onPetNameChange(name: String) {
+        _petName.value = name
     }
 
     fun onPetIconSelect(@DrawableRes iconRes: Int) {
@@ -65,9 +93,15 @@ class DogInfoEditViewModel @Inject constructor() : ViewModel() {
         _isDatePickerVisible.value = false
     }
 
-    companion object {
-        val DEFAULT_ADOPTION_DATE: LocalDate = localDateOf(2019, 2, 4)
+    private fun currentPetInfo(): PetInfo {
+        return PetInfo(
+            iconRes = _petIconRes.value,
+            name = _petName.value,
+            adoptionDate = _adoptionDate.value,
+        )
+    }
 
+    companion object {
         val SELECTABLE_PET_ICON_RES: List<Int> = listOf(
             R.drawable.ic_dog1,
             R.drawable.ic_dog19,

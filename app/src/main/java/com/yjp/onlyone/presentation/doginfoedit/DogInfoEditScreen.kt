@@ -46,11 +46,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yjp.onlyone.R
-import com.yjp.onlyone.presentation.home.HomeViewModel
 import com.yjp.onlyone.ui.modifier.dogInfoPetIconShadow
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 import com.yjp.onlyone.ui.dialog.PastOrTodayDatePickerDialog
 import com.yjp.onlyone.util.formatDotSeparated
+import com.yjp.onlyone.util.todayLocalDate
 import java.time.LocalDate
 
 private val DogInfoEditTopBarTopPadding = 10.dp
@@ -79,12 +79,13 @@ private val DogInfoEditScrollBottomPadding = 24.dp
 
 @Composable
 fun DogInfoEditScreen(
-    @DrawableRes petIconRes: Int = HomeViewModel.DEFAULT_PET_ICON_RES,
-    petName: String = HomeViewModel.DEFAULT_PET_NAME,
-    adoptionDate: LocalDate = DogInfoEditViewModel.DEFAULT_ADOPTION_DATE,
+    @DrawableRes petIconRes: Int = R.drawable.ic_dog1,
+    petName: String = "내새꾸",
+    adoptionDate: LocalDate = todayLocalDate(),
     selectablePetIconRes: List<Int> = DogInfoEditViewModel.SELECTABLE_PET_ICON_RES,
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {},
+    onPetNameChange: (String) -> Unit = {},
     onPetIconSelect: (Int) -> Unit = {},
     isDatePickerVisible: Boolean = false,
     onCalendarClick: () -> Unit = {},
@@ -131,6 +132,7 @@ fun DogInfoEditScreen(
                 topBarTextStyle = topBarTextStyle,
                 petName = petName,
                 adoptionDate = adoptionDate,
+                onPetNameChange = onPetNameChange,
                 onCalendarClick = onCalendarClick,
             )
         }
@@ -207,10 +209,9 @@ private fun DogInfoEditPetFormSection(
     topBarTextStyle: TextStyle,
     petName: String,
     adoptionDate: LocalDate,
+    onPetNameChange: (String) -> Unit,
     onCalendarClick: () -> Unit,
 ) {
-    var petNameInput by remember(petName) { mutableStateOf(petName) }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -222,8 +223,8 @@ private fun DogInfoEditPetFormSection(
     ) {
         DogInfoEditLabeledTextField(
             label = stringResource(R.string.dog_info_edit_name_label),
-            value = petNameInput,
-            onValueChange = { petNameInput = it },
+            value = petName,
+            onValueChange = onPetNameChange,
             labelStyle = topBarTextStyle,
         )
         DogInfoEditLabeledAdoptionDateField(
@@ -536,6 +537,8 @@ private fun DogInfoEditPetIconView(
 @Composable
 private fun DogInfoEditScreenPreview() {
     OnlyOneTheme {
-        DogInfoEditScreen()
+        DogInfoEditScreen(
+            petName = "내새꾸",
+        )
     }
 }

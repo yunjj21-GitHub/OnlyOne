@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.yjp.onlyone.data.local.OnlyOneDatabase
 import com.yjp.onlyone.data.local.dao.MemoDao
+import com.yjp.onlyone.data.local.dao.PetDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,5 +31,10 @@ object DatabaseModule {
     @Provides
     fun provideMemoDao(database: OnlyOneDatabase): MemoDao {
         return database.memoDao()
+    }
+
+    @Provides
+    fun providePetDao(database: OnlyOneDatabase): PetDao {
+        return database.petDao()
     }
 }

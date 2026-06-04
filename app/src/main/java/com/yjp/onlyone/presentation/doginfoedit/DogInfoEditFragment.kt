@@ -45,6 +45,7 @@ class DogInfoEditFragment : BaseFragment<FragmentDogInfoEditBinding>() {
                 adoptionDate = adoptionDate,
                 onBackClick = viewModel::onBackClick,
                 onSaveClick = viewModel::onSaveClick,
+                onPetNameChange = viewModel::onPetNameChange,
                 onPetIconSelect = viewModel::onPetIconSelect,
                 isDatePickerVisible = isDatePickerVisible,
                 onCalendarClick = viewModel::onCalendarClick,
