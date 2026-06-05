@@ -55,6 +55,8 @@ class HomeViewModel @Inject constructor(
     private val _navigationEvent = MutableSharedFlow<HomeNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<HomeNavigation> = _navigationEvent.asSharedFlow()
 
+    private var lastBackPressTimeMillis = 0L
+
     init {
         loadPetInfo()
     }
@@ -102,6 +104,17 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onBackPressed(): HomeBackPress {
+        val now = System.currentTimeMillis()
+        return if (now - lastBackPressTimeMillis <= EXIT_BACK_PRESS_INTERVAL_MILLIS) {
+            lastBackPressTimeMillis = 0L
+            HomeBackPress.FinishApp
+        } else {
+            lastBackPressTimeMillis = now
+            HomeBackPress.ShowExitToast
+        }
+    }
+
     private fun applyHappinessInput(input: HomeHappinessInput) {
         _happinessInput.value = input
         _happinessIndex.value = HappinessIndexCalculator.calculate(input)
@@ -111,6 +124,7 @@ class HomeViewModel @Inject constructor(
     companion object {
         const val HAPPINESS_INDEX_MIN = 0
         const val HAPPINESS_INDEX_MAX = 100
+        const val EXIT_BACK_PRESS_INTERVAL_MILLIS = 2_000L
 
         @DrawableRes
         val DEFAULT_PET_ICON_RES: Int = R.drawable.ic_dog1
