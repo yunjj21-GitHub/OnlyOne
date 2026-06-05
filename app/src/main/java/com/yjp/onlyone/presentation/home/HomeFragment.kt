@@ -18,7 +18,7 @@ import com.yjp.onlyone.R
 import com.yjp.onlyone.base.BaseFragment
 import com.yjp.onlyone.base.setThemeContent
 import com.yjp.onlyone.databinding.FragmentHomeBinding
-import com.yjp.onlyone.ui.component.rememberOnlyOneToast
+import com.yjp.onlyone.ui.component.rememberOOToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -56,7 +56,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             },
         )
         binding.homeComposeView.setThemeContent {
-            val showToast = rememberOnlyOneToast()
+            val showToast = rememberOOToast()
             val exitBackPressMessage = stringResource(R.string.home_exit_back_press_message)
             val petName by viewModel.petName.collectAsStateWithLifecycle()
             val petIconRes by viewModel.petIconRes.collectAsStateWithLifecycle()

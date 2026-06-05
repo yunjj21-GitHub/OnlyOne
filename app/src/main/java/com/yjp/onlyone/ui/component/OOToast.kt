@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.view.Gravity
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,19 +26,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.activity.ComponentActivity
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.yjp.onlyone.R
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
 @Composable
-fun rememberOnlyOneToast(): (String) -> Unit {
+fun rememberOOToast(): (String) -> Unit {
     val context = LocalContext.current
     val parentCompositionContext = rememberCompositionContext()
     return remember(context, parentCompositionContext) {
         { message ->
-            showOnlyOneToast(
+            showOOToast(
                 context = context,
                 message = message,
                 parentCompositionContext = parentCompositionContext,
@@ -47,23 +47,23 @@ fun rememberOnlyOneToast(): (String) -> Unit {
 }
 
 @Composable
-fun OnlyOneToast(
+fun OOToast(
     message: String,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(OnlyOneToastCornerRadius),
+        shape = RoundedCornerShape(OOToastCornerRadius),
         color = colorResource(R.color.toast_background),
     ) {
         Text(
             text = message,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(OnlyOneToastPadding),
+                .padding(OOToastPadding),
             color = colorResource(R.color.white),
-            fontSize = OnlyOneToastTextSize,
-            lineHeight = OnlyOneToastLineHeight,
+            fontSize = OOToastTextSize,
+            lineHeight = OOToastLineHeight,
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -71,7 +71,7 @@ fun OnlyOneToast(
     }
 }
 
-private fun showOnlyOneToast(
+private fun showOOToast(
     context: Context,
     message: String,
     parentCompositionContext: CompositionContext,
@@ -83,11 +83,11 @@ private fun showOnlyOneToast(
             OnlyOneTheme {
                 Box(
                     modifier = Modifier.padding(
-                        horizontal = OnlyOneToastHorizontalMargin,
-                        vertical = OnlyOneToastVerticalMargin,
+                        horizontal = OOToastHorizontalMargin,
+                        vertical = OOToastVerticalMargin,
                     ),
                 ) {
-                    OnlyOneToast(message = message)
+                    OOToast(message = message)
                 }
             }
         }
@@ -111,21 +111,21 @@ private tailrec fun Context.findActivity(): Activity? = when (this) {
     else -> null
 }
 
-private val OnlyOneToastHorizontalMargin = 24.dp
-private val OnlyOneToastVerticalMargin = 32.dp
-private val OnlyOneToastCornerRadius = 10.dp
-private val OnlyOneToastPadding = 16.dp
-private val OnlyOneToastTextSize = 16.sp
-private val OnlyOneToastLineHeight = 24.sp
+private val OOToastHorizontalMargin = 24.dp
+private val OOToastVerticalMargin = 32.dp
+private val OOToastCornerRadius = 10.dp
+private val OOToastPadding = 16.dp
+private val OOToastTextSize = 16.sp
+private val OOToastLineHeight = 24.sp
 
 @Preview(showBackground = true, backgroundColor = 0xFFEAEAEA)
 @Composable
-private fun OnlyOneToastPreview() {
+private fun OOToastPreview() {
     OnlyOneTheme {
         Box(
-            modifier = Modifier.padding(OnlyOneToastPadding),
+            modifier = Modifier.padding(OOToastPadding),
         ) {
-            OnlyOneToast(message = "토스트 바 입니다.")
+            OOToast(message = "토스트 바 입니다.")
         }
     }
 }
