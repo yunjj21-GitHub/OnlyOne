@@ -408,7 +408,7 @@ private fun DogInfoEditIconPickerItem(
     val borderModifier = if (isSelected) {
         Modifier.border(
             width = DogInfoEditIconPickerSelectedBorderWidth,
-            color = colorResource(R.color.primary_blue),
+            color = colorResource(R.color.slate),
             shape = CircleShape,
         )
     } else {
