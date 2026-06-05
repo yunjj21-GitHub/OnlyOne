@@ -17,4 +17,12 @@
     <string name="cancel">취소</string>
     <string name="pet_name_default">내새꾸</string>
     <string name="home_exit_back_press_message">\'뒤로\' 버튼을 한번 더 누르면 종료됩니다.</string>
+    <string name="home_location_prompt_title">산책하기에 가장 좋은 시간은?</string>
+    <string name="home_location_prompt_description">
+        현재 위치를 기반으로\n
+        날씨를 조회하여\n
+        산책하기 가장 좋은\n
+        시간대를 추천해드려요!
+    </string>
+    <string name="home_location_permission_allow">위치 권한 허용</string>
 </resources>

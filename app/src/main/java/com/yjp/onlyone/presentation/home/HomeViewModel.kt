@@ -10,6 +10,7 @@ import com.yjp.onlyone.domain.model.HomeHappinessInput
 import com.yjp.onlyone.domain.repository.HappinessRepository
 import com.yjp.onlyone.domain.repository.PetRepository
 import com.yjp.onlyone.util.daysFromToToday
+import com.yjp.onlyone.util.hasLocationPermission
 import com.yjp.onlyone.util.toEpochDayValue
 import com.yjp.onlyone.util.todayLocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,7 +30,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val petRepository: PetRepository,
     private val happinessRepository: HappinessRepository,
-    @ApplicationContext context: Context,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _petName = MutableStateFlow(context.getString(R.string.pet_name_default))
@@ -55,6 +56,9 @@ class HomeViewModel @Inject constructor(
 
     private val _daysTogether = MutableStateFlow(0)
     val daysTogether: StateFlow<Int> = _daysTogether.asStateFlow()
+
+    private val _isLocationPermissionGranted = MutableStateFlow(hasLocationPermission(context))
+    val isLocationPermissionGranted: StateFlow<Boolean> = _isLocationPermissionGranted.asStateFlow()
 
     private val _navigationEvent = MutableSharedFlow<HomeNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<HomeNavigation> = _navigationEvent.asSharedFlow()
@@ -117,6 +121,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _navigationEvent.emit(HomeNavigation.ToDogInfoEdit)
         }
+    }
+
+    fun refreshLocationPermissionState() {
+        _isLocationPermissionGranted.value = hasLocationPermission(context)
+    }
+
+    fun onLocationPermissionResult(granted: Boolean) {
+        _isLocationPermissionGranted.value = granted
     }
 
     fun onBackPressed(): HomeBackPress {

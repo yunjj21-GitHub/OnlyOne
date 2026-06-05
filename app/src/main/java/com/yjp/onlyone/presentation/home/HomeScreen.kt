@@ -67,6 +67,8 @@ fun HomeScreen(
     ),
     activePicker: HomeHappinessPicker = HomeHappinessPicker.None,
     daysTogether: Int = 0,
+    isLocationPermissionGranted: Boolean = false,
+    onLocationPermissionClick: () -> Unit = {},
     onMemoClick: () -> Unit = {},
     onDogInfoEditClick: () -> Unit = {},
     onActivityStatClick: (HomeActivityType) -> Unit = {},
@@ -160,6 +162,11 @@ fun HomeScreen(
                     onActivityStatClick = onActivityStatClick,
                     modifier = Modifier.padding(top = 16.dp),
                 )
+                if (!isLocationPermissionGranted) {
+                    HomeLocationPermissionPrompt(
+                        onAllowLocationClick = onLocationPermissionClick,
+                    )
+                }
             }
         }
 
@@ -324,6 +331,7 @@ private fun HomeScreenPreview() {
             petIconRes = HomeViewModel.DEFAULT_PET_ICON_RES,
             happinessIndex = 0,
             daysTogether = 0,
+            isLocationPermissionGranted = false,
         )
     }
 }

@@ -19,6 +19,7 @@ import com.yjp.onlyone.base.BaseFragment
 import com.yjp.onlyone.base.setThemeContent
 import com.yjp.onlyone.databinding.FragmentHomeBinding
 import com.yjp.onlyone.ui.component.rememberOOToast
+import com.yjp.onlyone.util.LocationPermissionRequester
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -27,6 +28,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val viewModel: HomeViewModel by viewModels()
     private var showExitToast: (() -> Unit)? = null
+    private lateinit var locationPermissionRequester: LocationPermissionRequester
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        locationPermissionRequester = LocationPermissionRequester(this)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -41,6 +48,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         super.onResume()
         viewModel.loadPetInfo()
         viewModel.loadHappinessInput()
+        viewModel.refreshLocationPermissionState()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,6 +73,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             val activityStats by viewModel.activityStats.collectAsStateWithLifecycle()
             val activePicker by viewModel.activePicker.collectAsStateWithLifecycle()
             val daysTogether by viewModel.daysTogether.collectAsStateWithLifecycle()
+            val isLocationPermissionGranted by viewModel.isLocationPermissionGranted.collectAsStateWithLifecycle()
 
             SideEffect {
                 showExitToast = { showToast(exitBackPressMessage) }
@@ -77,6 +86,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 activityStats = activityStats,
                 activePicker = activePicker,
                 daysTogether = daysTogether,
+                isLocationPermissionGranted = isLocationPermissionGranted,
+                onLocationPermissionClick = {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        val granted = locationPermissionRequester.requestLocationPermission()
+                        viewModel.onLocationPermissionResult(granted)
+                    }
+                },
                 onMemoClick = viewModel::onMemoClick,
                 onDogInfoEditClick = viewModel::onDogInfoEditClick,
                 onActivityStatClick = viewModel::onActivityStatClick,
