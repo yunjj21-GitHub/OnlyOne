@@ -43,14 +43,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             val petName by viewModel.petName.collectAsStateWithLifecycle()
             val petIconRes by viewModel.petIconRes.collectAsStateWithLifecycle()
             val happinessIndex by viewModel.happinessIndex.collectAsStateWithLifecycle()
+            val activityStats by viewModel.activityStats.collectAsStateWithLifecycle()
+            val activePicker by viewModel.activePicker.collectAsStateWithLifecycle()
             val daysTogether by viewModel.daysTogether.collectAsStateWithLifecycle()
             HomeScreen(
                 petName = petName,
                 petIconRes = petIconRes,
                 happinessIndex = happinessIndex,
+                activityStats = activityStats,
+                activePicker = activePicker,
                 daysTogether = daysTogether,
                 onMemoClick = viewModel::onMemoClick,
                 onDogInfoEditClick = viewModel::onDogInfoEditClick,
+                onActivityStatClick = viewModel::onActivityStatClick,
+                onDismissPicker = viewModel::dismissPicker,
+                onConfirmPicker = viewModel::confirmPicker,
             )
         }
         viewLifecycleOwner.lifecycleScope.launch {

@@ -22,10 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -38,13 +35,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yjp.onlyone.R
+import com.yjp.onlyone.domain.model.HomeHappinessInput
 import com.yjp.onlyone.ui.component.SkyBlueGradientProgressRing
 import com.yjp.onlyone.ui.dialog.ListPickerDialog
 import com.yjp.onlyone.ui.modifier.homeHappinessCardShadow
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
 private val HomePetProgressRingSize = 210.dp
-private val PetTextSizeReduce = 2.sp
 private val HomeContentPanelCornerRadius = 14.dp
 private val HomeContentPanelContentPadding = 20.dp
 private val HomeContentPanelShadowBleedHorizontal = 6.dp
@@ -60,32 +57,21 @@ private val HomeActivityStatLabelLineHeight = 24.sp
 private val HomeActivityStatValueFontSize = 17.sp
 private val HomeActivityStatValueLineHeight = 22.sp
 
-private data class HomeActivityStat(
-    val label: String,
-    val value: String,
-)
-
-private val DefaultHomeActivityStats = listOf(
-    HomeActivityStat(label = "밥", value = "0회"),
-    HomeActivityStat(label = "산책", value = "0분"),
-    HomeActivityStat(label = "놀이", value = "0분"),
-    HomeActivityStat(label = "간식", value = "0회"),
-    HomeActivityStat(label = "양치", value = "X"),
-)
-
-/** ListPicker UI 확인용 — 산책 예시 데이터 */
-private val WalkPickerPreviewTitle = "산책"
-private val WalkPickerPreviewOptions = listOf("10분", "20분", "30분", "40분", "50분", "60분")
-private const val WalkPickerPreviewInitialIndex = 1
-
 @Composable
 fun HomeScreen(
     petName: String,
     @DrawableRes petIconRes: Int = R.drawable.ic_dog1,
-    happinessIndex: Int = HomeViewModel.DEFAULT_HAPPINESS_INDEX,
+    happinessIndex: Int = 0,
+    activityStats: List<HomeActivityStatUi> = HomeHappinessUiMapper.buildActivityStats(
+        HomeHappinessInput(),
+    ),
+    activePicker: HomeHappinessPicker = HomeHappinessPicker.None,
     daysTogether: Int = 0,
     onMemoClick: () -> Unit = {},
     onDogInfoEditClick: () -> Unit = {},
+    onActivityStatClick: (HomeActivityType) -> Unit = {},
+    onDismissPicker: () -> Unit = {},
+    onConfirmPicker: (HomeActivityType, Int) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
 ) {
     val happinessProgress = remember(happinessIndex) {
@@ -102,8 +88,6 @@ fun HomeScreen(
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,
     )
-
-    var isWalkPickerPreviewVisible by remember { mutableStateOf(false) }
 
     val primaryBlue = colorResource(R.color.primary_blue)
     val homeBackgroundBrush = Brush.verticalGradient(
@@ -128,65 +112,68 @@ fun HomeScreen(
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            HomeTopIconButton(
-                iconRes = R.drawable.ic_speech_bubble,
-                onClick = onMemoClick,
-            )
-            HomeTopIconButton(
-                iconRes = R.drawable.ic_pencil,
-                onClick = onDogInfoEditClick,
-            )
-        }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(contentAlignment = Alignment.TopCenter) {
-                Box(
-                    modifier = Modifier
-                        .size(HomePetProgressRingSize),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    SkyBlueGradientProgressRing(
-                        progress = happinessProgress,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    Image(
-                        painter = painterResource(petIconRes),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit,
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                HomeTopIconButton(
+                    iconRes = R.drawable.ic_speech_bubble,
+                    onClick = onMemoClick,
+                )
+                HomeTopIconButton(
+                    iconRes = R.drawable.ic_pencil,
+                    onClick = onDogInfoEditClick,
+                )
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(contentAlignment = Alignment.TopCenter) {
+                    Box(
+                        modifier = Modifier.size(HomePetProgressRingSize),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        SkyBlueGradientProgressRing(
+                            progress = happinessProgress,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                        Image(
+                            painter = painterResource(petIconRes),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Fit,
+                        )
+                    }
+                    Text(
+                        text = petName,
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        style = petNameStyle,
                     )
                 }
                 Text(
-                    text = petName,
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    style = petNameStyle,
+                    text = togetherDaysText,
+                    modifier = Modifier.padding(top = 10.dp),
+                    style = togetherDaysStyle,
+                )
+                HomeContentPanel(
+                    happinessIndex = happinessIndex,
+                    activityStats = activityStats,
+                    onActivityStatClick = onActivityStatClick,
+                    modifier = Modifier.padding(top = 16.dp),
                 )
             }
-            Text(
-                text = togetherDaysText,
-                modifier = Modifier.padding(top = 10.dp),
-                style = togetherDaysStyle,
-            )
-            HomeContentPanel(
-                happinessIndex = happinessIndex,
-                onWalkStatClick = { isWalkPickerPreviewVisible = true },
-                modifier = Modifier.padding(top = 16.dp),
-            )
-        }
         }
 
-        if (isWalkPickerPreviewVisible) {
+        val activeHappinessPicker = activePicker as? HomeHappinessPicker.Active
+        if (activeHappinessPicker != null) {
             ListPickerDialog(
-                title = WalkPickerPreviewTitle,
-                options = WalkPickerPreviewOptions,
-                initialIndex = WalkPickerPreviewInitialIndex,
-                onDismissRequest = { isWalkPickerPreviewVisible = false },
-                onCancel = { isWalkPickerPreviewVisible = false },
-                onConfirm = { isWalkPickerPreviewVisible = false },
+                title = HomeHappinessPickerConfig.titleFor(activeHappinessPicker.type),
+                options = HomeHappinessPickerConfig.labelsFor(activeHappinessPicker.type),
+                initialIndex = activeHappinessPicker.initialIndex,
+                onDismissRequest = onDismissPicker,
+                onCancel = onDismissPicker,
+                onConfirm = { selectedIndex ->
+                    onConfirmPicker(activeHappinessPicker.type, selectedIndex)
+                },
             )
         }
     }
@@ -195,7 +182,8 @@ fun HomeScreen(
 @Composable
 private fun HomeContentPanel(
     happinessIndex: Int,
-    onWalkStatClick: () -> Unit = {},
+    activityStats: List<HomeActivityStatUi>,
+    onActivityStatClick: (HomeActivityType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val happinessIndexLabelStyle = MaterialTheme.typography.titleMedium.copy(
@@ -238,11 +226,12 @@ private fun HomeContentPanel(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top,
                 ) {
-                    DefaultHomeActivityStats.forEach { stat ->
+                    activityStats.forEach { stat ->
                         HomeActivityStatColumn(
                             label = stat.label,
-                            value = stat.value,
-                            onClick = if (stat.label == "산책") onWalkStatClick else null,
+                            value = stat.valueText,
+                            isMaxScore = stat.isMaxScore,
+                            onClick = { onActivityStatClick(stat.type) },
                         )
                     }
                 }
@@ -255,9 +244,11 @@ private fun HomeContentPanel(
 private fun HomeActivityStatColumn(
     label: String,
     value: String,
-    onClick: (() -> Unit)? = null,
+    isMaxScore: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val boneIconRes = if (isMaxScore) R.drawable.ic_bone_slate else R.drawable.ic_bone_muted
     val labelStyle = MaterialTheme.typography.bodyMedium.copy(
         fontSize = HomeActivityStatLabelFontSize,
         lineHeight = HomeActivityStatLabelLineHeight,
@@ -271,16 +262,10 @@ private fun HomeActivityStatColumn(
         color = colorResource(R.color.black),
     )
     Column(
-        modifier = modifier.then(
-            if (onClick != null) {
-                Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClick,
-                )
-            } else {
-                Modifier
-            },
+        modifier = modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onClick,
         ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -294,7 +279,7 @@ private fun HomeActivityStatColumn(
             style = valueStyle,
         )
         Image(
-            painter = painterResource(R.drawable.ic_bone_muted),
+            painter = painterResource(boneIconRes),
             contentDescription = null,
             modifier = Modifier
                 .padding(top = HomeActivityStatBoneIconTopPadding)
@@ -337,7 +322,7 @@ private fun HomeScreenPreview() {
         HomeScreen(
             petName = "내새꾸",
             petIconRes = HomeViewModel.DEFAULT_PET_ICON_RES,
-            happinessIndex = HomeViewModel.DEFAULT_HAPPINESS_INDEX,
+            happinessIndex = 0,
             daysTogether = 0,
         )
     }

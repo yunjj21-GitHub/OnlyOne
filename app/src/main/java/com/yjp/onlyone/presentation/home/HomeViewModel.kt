@@ -5,6 +5,8 @@ import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yjp.onlyone.R
+import com.yjp.onlyone.domain.happiness.HappinessIndexCalculator
+import com.yjp.onlyone.domain.model.HomeHappinessInput
 import com.yjp.onlyone.domain.repository.PetRepository
 import com.yjp.onlyone.util.daysFromToToday
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,8 +35,19 @@ class HomeViewModel @Inject constructor(
     private val _petIconRes = MutableStateFlow(R.drawable.ic_dog1)
     val petIconRes: StateFlow<Int> = _petIconRes.asStateFlow()
 
-    private val _happinessIndex = MutableStateFlow(DEFAULT_HAPPINESS_INDEX)
+    private val _happinessInput = MutableStateFlow(HomeHappinessInput())
+    val happinessInput: StateFlow<HomeHappinessInput> = _happinessInput.asStateFlow()
+
+    private val _happinessIndex = MutableStateFlow(0)
     val happinessIndex: StateFlow<Int> = _happinessIndex.asStateFlow()
+
+    private val _activityStats = MutableStateFlow(
+        HomeHappinessUiMapper.buildActivityStats(HomeHappinessInput()),
+    )
+    val activityStats: StateFlow<List<HomeActivityStatUi>> = _activityStats.asStateFlow()
+
+    private val _activePicker = MutableStateFlow<HomeHappinessPicker>(HomeHappinessPicker.None)
+    val activePicker: StateFlow<HomeHappinessPicker> = _activePicker.asStateFlow()
 
     private val _daysTogether = MutableStateFlow(0)
     val daysTogether: StateFlow<Int> = _daysTogether.asStateFlow()
@@ -55,6 +68,28 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onActivityStatClick(type: HomeActivityType) {
+        _activePicker.value = HomeHappinessPicker.Active(
+            type = type,
+            initialIndex = HomeHappinessPickerConfig.initialIndex(type, _happinessInput.value),
+        )
+    }
+
+    fun dismissPicker() {
+        _activePicker.value = HomeHappinessPicker.None
+    }
+
+    fun confirmPicker(type: HomeActivityType, selectedIndex: Int) {
+        applyHappinessInput(
+            HomeHappinessPickerConfig.applySelection(
+                type = type,
+                input = _happinessInput.value,
+                selectedIndex = selectedIndex,
+            ),
+        )
+        dismissPicker()
+    }
+
     fun onMemoClick() {
         viewModelScope.launch {
             _navigationEvent.emit(HomeNavigation.ToMemo)
@@ -67,10 +102,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun applyHappinessInput(input: HomeHappinessInput) {
+        _happinessInput.value = input
+        _happinessIndex.value = HappinessIndexCalculator.calculate(input)
+        _activityStats.value = HomeHappinessUiMapper.buildActivityStats(input)
+    }
+
     companion object {
         const val HAPPINESS_INDEX_MIN = 0
         const val HAPPINESS_INDEX_MAX = 100
-        const val DEFAULT_HAPPINESS_INDEX = 0
 
         @DrawableRes
         val DEFAULT_PET_ICON_RES: Int = R.drawable.ic_dog1
