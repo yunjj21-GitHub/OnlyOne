@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.yjp.onlyone.R
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
@@ -57,7 +58,8 @@ fun MemoScreen(
         fontWeight = FontWeight.Bold,
         color = colorResource(R.color.black),
     )
-    val memoInputTextStyle = MaterialTheme.typography.titleLarge.copy(
+    val memoInputTextStyle = MaterialTheme.typography.titleMedium.copy(
+        fontSize = 18.sp,
         color = colorResource(R.color.black),
     )
     val memoHintTextStyle = memoInputTextStyle.copy(

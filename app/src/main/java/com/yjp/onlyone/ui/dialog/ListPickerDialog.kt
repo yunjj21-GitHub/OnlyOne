@@ -134,7 +134,7 @@ private fun ListPickerDialogContent(
                 )
                 IconButton(
                     onClick = onCancel,
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier.size(32.dp),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_cancel),
