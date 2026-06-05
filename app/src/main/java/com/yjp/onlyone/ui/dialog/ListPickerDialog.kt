@@ -262,8 +262,8 @@ private fun androidx.compose.foundation.lazy.LazyListState.centeredItemIndex(): 
 
 private val ListPickerDialogHorizontalMargin = 24.dp
 private val ListPickerDialogPadding = 20.dp
-private val ListPickerDialogCornerRadius = 20.dp
-private val ListPickerConfirmCornerRadius = 12.dp
+private val ListPickerDialogCornerRadius = 10.dp
+private val ListPickerConfirmCornerRadius = 10.dp
 private val ListPickerItemHeight = 40.dp
 private val ListPickerViewportHeight = ListPickerItemHeight * 3
 /** 상·하단 페이드. 짧을수록 인접 항목이 더 잘 보임 */

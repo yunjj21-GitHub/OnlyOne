@@ -193,7 +193,7 @@ fun OOAlertDialogContent(
                     .padding(top = if (title.isNullOrBlank()) 0.dp else OOAlertTitleContentSpacing),
                 style = contentStyle,
                 color = black,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Left,
             )
             Row(
                 modifier = Modifier
@@ -271,13 +271,13 @@ private fun ooAlertButtonTextStyle(): TextStyle =
 
 private val OOAlertDialogHorizontalMargin = 24.dp
 private val OOAlertDialogPadding = 20.dp
-private val OOAlertDialogCornerRadius = 20.dp
+private val OOAlertDialogCornerRadius = 10.dp
 private val OOAlertDialogShadowElevation = 6.dp
 private val OOAlertTitleContentSpacing = 12.dp
 private val OOAlertContentButtonSpacing = 24.dp
 private val OOAlertButtonSpacing = 12.dp
 private val OOAlertButtonHeight = 48.dp
-private val OOAlertButtonCornerRadius = 12.dp
+private val OOAlertButtonCornerRadius = 10.dp
 private val OOAlertConfirmBorderWidth = 1.dp
 
 @Preview(showBackground = true, backgroundColor = 0xFFEAEAEA)
