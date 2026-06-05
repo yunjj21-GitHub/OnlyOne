@@ -10,4 +10,5 @@
     <color name="bone_muted">#C2C2C2</color>
     <color name="memo_paper">#EEEEEE</color>
     <color name="memo_input_hint">#8E8E93</color>
+    <color name="toast_background">#70000000</color>
 </resources>
