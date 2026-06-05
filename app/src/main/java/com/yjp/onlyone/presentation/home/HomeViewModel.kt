@@ -7,8 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.yjp.onlyone.R
 import com.yjp.onlyone.domain.happiness.HappinessIndexCalculator
 import com.yjp.onlyone.domain.model.HomeHappinessInput
+import com.yjp.onlyone.domain.repository.HappinessRepository
 import com.yjp.onlyone.domain.repository.PetRepository
 import com.yjp.onlyone.util.daysFromToToday
+import com.yjp.onlyone.util.toEpochDayValue
+import com.yjp.onlyone.util.todayLocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val petRepository: PetRepository,
+    private val happinessRepository: HappinessRepository,
     @ApplicationContext context: Context,
 ) : ViewModel() {
 
@@ -56,9 +60,18 @@ class HomeViewModel @Inject constructor(
     val navigationEvent: SharedFlow<HomeNavigation> = _navigationEvent.asSharedFlow()
 
     private var lastBackPressTimeMillis = 0L
+    private var loadedDateEpochDay: Long = todayLocalDate().toEpochDayValue()
 
     init {
         loadPetInfo()
+        loadHappinessInput()
+    }
+
+    fun loadHappinessInput() {
+        viewModelScope.launch {
+            loadedDateEpochDay = todayLocalDate().toEpochDayValue()
+            updateHappinessUi(happinessRepository.getHappinessInput())
+        }
     }
 
     fun loadPetInfo() {
@@ -71,6 +84,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onActivityStatClick(type: HomeActivityType) {
+        ensureTodayHappinessInput()
         _activePicker.value = HomeHappinessPicker.Active(
             type = type,
             initialIndex = HomeHappinessPickerConfig.initialIndex(type, _happinessInput.value),
@@ -82,6 +96,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun confirmPicker(type: HomeActivityType, selectedIndex: Int) {
+        ensureTodayHappinessInput()
         applyHappinessInput(
             HomeHappinessPickerConfig.applySelection(
                 type = type,
@@ -116,6 +131,20 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun applyHappinessInput(input: HomeHappinessInput) {
+        updateHappinessUi(input)
+        viewModelScope.launch {
+            happinessRepository.saveHappinessInput(input)
+        }
+    }
+
+    private fun ensureTodayHappinessInput() {
+        val todayEpochDay = todayLocalDate().toEpochDayValue()
+        if (loadedDateEpochDay == todayEpochDay) return
+        loadedDateEpochDay = todayEpochDay
+        updateHappinessUi(HomeHappinessInput())
+    }
+
+    private fun updateHappinessUi(input: HomeHappinessInput) {
         _happinessInput.value = input
         _happinessIndex.value = HappinessIndexCalculator.calculate(input)
         _activityStats.value = HomeHappinessUiMapper.buildActivityStats(input)

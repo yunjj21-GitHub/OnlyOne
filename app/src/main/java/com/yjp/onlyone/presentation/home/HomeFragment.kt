@@ -40,6 +40,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onResume() {
         super.onResume()
         viewModel.loadPetInfo()
+        viewModel.loadHappinessInput()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

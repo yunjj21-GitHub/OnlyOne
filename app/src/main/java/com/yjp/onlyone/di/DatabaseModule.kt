@@ -3,6 +3,7 @@ package com.yjp.onlyone.di
 import android.content.Context
 import androidx.room.Room
 import com.yjp.onlyone.data.local.OnlyOneDatabase
+import com.yjp.onlyone.data.local.dao.HappinessDao
 import com.yjp.onlyone.data.local.dao.MemoDao
 import com.yjp.onlyone.data.local.dao.PetDao
 import dagger.Module
@@ -36,5 +37,10 @@ object DatabaseModule {
     @Provides
     fun providePetDao(database: OnlyOneDatabase): PetDao {
         return database.petDao()
+    }
+
+    @Provides
+    fun provideHappinessDao(database: OnlyOneDatabase): HappinessDao {
+        return database.happinessDao()
     }
 }

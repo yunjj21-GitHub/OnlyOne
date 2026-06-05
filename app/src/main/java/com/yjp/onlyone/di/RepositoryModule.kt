@@ -1,7 +1,9 @@
 package com.yjp.onlyone.di
 
+import com.yjp.onlyone.data.repository.HappinessRepositoryImpl
 import com.yjp.onlyone.data.repository.MemoRepositoryImpl
 import com.yjp.onlyone.data.repository.PetRepositoryImpl
+import com.yjp.onlyone.domain.repository.HappinessRepository
 import com.yjp.onlyone.domain.repository.MemoRepository
 import com.yjp.onlyone.domain.repository.PetRepository
 import dagger.Binds
@@ -25,4 +27,10 @@ abstract class RepositoryModule {
     abstract fun bindPetRepository(
         impl: PetRepositoryImpl,
     ): PetRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHappinessRepository(
+        impl: HappinessRepositoryImpl,
+    ): HappinessRepository
 }
