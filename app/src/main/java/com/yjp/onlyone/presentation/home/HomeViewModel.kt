@@ -70,7 +70,7 @@ class HomeViewModel @Inject constructor(
     companion object {
         const val HAPPINESS_INDEX_MIN = 0
         const val HAPPINESS_INDEX_MAX = 100
-        const val DEFAULT_HAPPINESS_INDEX = 55
+        const val DEFAULT_HAPPINESS_INDEX = 0
 
         @DrawableRes
         val DEFAULT_PET_ICON_RES: Int = R.drawable.ic_dog1

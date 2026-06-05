@@ -22,7 +22,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -36,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yjp.onlyone.R
 import com.yjp.onlyone.ui.component.SkyBlueGradientProgressRing
+import com.yjp.onlyone.ui.dialog.ListPickerDialog
 import com.yjp.onlyone.ui.modifier.homeHappinessCardShadow
 import com.yjp.onlyone.ui.theme.OnlyOneTheme
 
@@ -63,11 +67,16 @@ private data class HomeActivityStat(
 
 private val DefaultHomeActivityStats = listOf(
     HomeActivityStat(label = "밥", value = "0회"),
-    HomeActivityStat(label = "산책", value = "0M"),
-    HomeActivityStat(label = "놀이", value = "0M"),
+    HomeActivityStat(label = "산책", value = "0분"),
+    HomeActivityStat(label = "놀이", value = "0분"),
     HomeActivityStat(label = "간식", value = "0회"),
     HomeActivityStat(label = "양치", value = "X"),
 )
+
+/** ListPicker UI 확인용 — 산책 예시 데이터 */
+private val WalkPickerPreviewTitle = "산책"
+private val WalkPickerPreviewOptions = listOf("10분", "20분", "30분", "40분", "50분", "60분")
+private const val WalkPickerPreviewInitialIndex = 1
 
 @Composable
 fun HomeScreen(
@@ -93,6 +102,8 @@ fun HomeScreen(
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.onSurface,
     )
+
+    var isWalkPickerPreviewVisible by remember { mutableStateOf(false) }
 
     val primaryBlue = colorResource(R.color.primary_blue)
     val homeBackgroundBrush = Brush.verticalGradient(
@@ -162,9 +173,21 @@ fun HomeScreen(
             )
             HomeContentPanel(
                 happinessIndex = happinessIndex,
+                onWalkStatClick = { isWalkPickerPreviewVisible = true },
                 modifier = Modifier.padding(top = 16.dp),
             )
         }
+        }
+
+        if (isWalkPickerPreviewVisible) {
+            ListPickerDialog(
+                title = WalkPickerPreviewTitle,
+                options = WalkPickerPreviewOptions,
+                initialIndex = WalkPickerPreviewInitialIndex,
+                onDismissRequest = { isWalkPickerPreviewVisible = false },
+                onCancel = { isWalkPickerPreviewVisible = false },
+                onConfirm = { isWalkPickerPreviewVisible = false },
+            )
         }
     }
 }
@@ -172,6 +195,7 @@ fun HomeScreen(
 @Composable
 private fun HomeContentPanel(
     happinessIndex: Int,
+    onWalkStatClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val happinessIndexLabelStyle = MaterialTheme.typography.titleMedium.copy(
@@ -218,6 +242,7 @@ private fun HomeContentPanel(
                         HomeActivityStatColumn(
                             label = stat.label,
                             value = stat.value,
+                            onClick = if (stat.label == "산책") onWalkStatClick else null,
                         )
                     }
                 }
@@ -230,6 +255,7 @@ private fun HomeContentPanel(
 private fun HomeActivityStatColumn(
     label: String,
     value: String,
+    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val labelStyle = MaterialTheme.typography.bodyMedium.copy(
@@ -245,7 +271,17 @@ private fun HomeActivityStatColumn(
         color = colorResource(R.color.black),
     )
     Column(
-        modifier = modifier,
+        modifier = modifier.then(
+            if (onClick != null) {
+                Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClick,
+                )
+            } else {
+                Modifier
+            },
+        ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
