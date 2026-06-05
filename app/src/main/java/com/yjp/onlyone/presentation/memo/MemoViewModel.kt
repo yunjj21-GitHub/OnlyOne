@@ -24,13 +24,20 @@ class MemoViewModel @Inject constructor(
     private val _navigationEvent = MutableSharedFlow<MemoNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<MemoNavigation> = _navigationEvent.asSharedFlow()
 
+    private val _discardAlertRequest = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val discardAlertRequest: SharedFlow<Unit> = _discardAlertRequest.asSharedFlow()
+
+    private var savedMemoContent = ""
+
     init {
         loadMemo()
     }
 
     private fun loadMemo() {
         viewModelScope.launch {
-            _memoContent.value = memoRepository.getMemoContent()
+            val content = memoRepository.getMemoContent()
+            _memoContent.value = content
+            savedMemoContent = content
         }
     }
 
@@ -41,10 +48,25 @@ class MemoViewModel @Inject constructor(
     fun onSaveClick() {
         viewModelScope.launch {
             memoRepository.saveMemoContent(_memoContent.value)
+            savedMemoContent = _memoContent.value
         }
     }
 
     fun onBackClick() {
+        if (hasUnsavedChanges()) {
+            _discardAlertRequest.tryEmit(Unit)
+        } else {
+            navigateHome()
+        }
+    }
+
+    fun onDiscardConfirmed() {
+        navigateHome()
+    }
+
+    private fun hasUnsavedChanges(): Boolean = _memoContent.value != savedMemoContent
+
+    private fun navigateHome() {
         viewModelScope.launch {
             _navigationEvent.emit(MemoNavigation.ToHome)
         }

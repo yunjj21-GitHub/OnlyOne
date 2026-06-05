@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -15,6 +16,7 @@ import com.yjp.onlyone.R
 import com.yjp.onlyone.base.BaseFragment
 import com.yjp.onlyone.base.setThemeContent
 import com.yjp.onlyone.databinding.FragmentMemoBinding
+import com.yjp.onlyone.ui.dialog.OOUnsavedBackAlertHost
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -34,8 +36,20 @@ class MemoFragment : BaseFragment<FragmentMemoBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackClick()
+                }
+            },
+        )
         binding.memoComposeView.setThemeContent {
             val memoContent by viewModel.memoContent.collectAsStateWithLifecycle()
+            OOUnsavedBackAlertHost(
+                discardAlertRequest = viewModel.discardAlertRequest,
+                onDiscardConfirm = viewModel::onDiscardConfirmed,
+            )
             MemoScreen(
                 memoContent = memoContent,
                 onMemoContentChange = viewModel::updateMemoContent,

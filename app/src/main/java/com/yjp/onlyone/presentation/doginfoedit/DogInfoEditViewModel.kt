@@ -42,6 +42,11 @@ class DogInfoEditViewModel @Inject constructor(
     private val _navigationEvent = MutableSharedFlow<DogInfoEditNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<DogInfoEditNavigation> = _navigationEvent.asSharedFlow()
 
+    private val _discardAlertRequest = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val discardAlertRequest: SharedFlow<Unit> = _discardAlertRequest.asSharedFlow()
+
+    private var savedPetInfo: PetInfo? = null
+
     init {
         loadPetInfo()
     }
@@ -56,17 +61,30 @@ class DogInfoEditViewModel @Inject constructor(
         _petIconRes.value = petInfo.iconRes
         _petName.value = petInfo.name
         _adoptionDate.value = petInfo.adoptionDate
+        savedPetInfo = petInfo
     }
 
     fun onBackClick() {
-        viewModelScope.launch {
-            _navigationEvent.emit(DogInfoEditNavigation.ToHome)
+        if (_isDatePickerVisible.value) {
+            _isDatePickerVisible.value = false
+            return
         }
+        if (hasUnsavedChanges()) {
+            _discardAlertRequest.tryEmit(Unit)
+        } else {
+            navigateHome()
+        }
+    }
+
+    fun onDiscardConfirmed() {
+        navigateHome()
     }
 
     fun onSaveClick() {
         viewModelScope.launch {
-            petRepository.savePetInfo(currentPetInfo())
+            val petInfo = currentPetInfo()
+            petRepository.savePetInfo(petInfo)
+            savedPetInfo = petInfo
         }
     }
 
@@ -99,6 +117,17 @@ class DogInfoEditViewModel @Inject constructor(
             name = _petName.value,
             adoptionDate = _adoptionDate.value,
         )
+    }
+
+    private fun hasUnsavedChanges(): Boolean {
+        val saved = savedPetInfo ?: return false
+        return currentPetInfo() != saved
+    }
+
+    private fun navigateHome() {
+        viewModelScope.launch {
+            _navigationEvent.emit(DogInfoEditNavigation.ToHome)
+        }
     }
 
     companion object {

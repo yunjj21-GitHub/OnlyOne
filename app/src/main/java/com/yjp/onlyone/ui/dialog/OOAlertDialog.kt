@@ -14,11 +14,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.flow.Flow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -75,6 +77,25 @@ data class OOAlertRequest(
 
 @Composable
 fun rememberOOAlertDialog(): OOAlertDialogState = remember { OOAlertDialogState() }
+
+@Composable
+fun OOUnsavedBackAlertHost(
+    discardAlertRequest: Flow<Unit>,
+    onDiscardConfirm: () -> Unit,
+    title: String = OOAlertDialogSampleTitle,
+    content: String = OOAlertDialogSampleContent,
+) {
+    val alertDialog = rememberOOAlertDialog()
+    LaunchedEffect(discardAlertRequest) {
+        discardAlertRequest.collect {
+            alertDialog.show(title = title, content = content)
+        }
+    }
+    OOAlertDialogHost(
+        state = alertDialog,
+        onConfirm = onDiscardConfirm,
+    )
+}
 
 @Composable
 fun OOAlertDialogHost(

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -15,6 +16,7 @@ import com.yjp.onlyone.R
 import com.yjp.onlyone.base.BaseFragment
 import com.yjp.onlyone.base.setThemeContent
 import com.yjp.onlyone.databinding.FragmentDogInfoEditBinding
+import com.yjp.onlyone.ui.dialog.OOUnsavedBackAlertHost
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -34,11 +36,23 @@ class DogInfoEditFragment : BaseFragment<FragmentDogInfoEditBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackClick()
+                }
+            },
+        )
         binding.dogInfoEditComposeView.setThemeContent {
             val petIconRes by viewModel.petIconRes.collectAsStateWithLifecycle()
             val petName by viewModel.petName.collectAsStateWithLifecycle()
             val adoptionDate by viewModel.adoptionDate.collectAsStateWithLifecycle()
             val isDatePickerVisible by viewModel.isDatePickerVisible.collectAsStateWithLifecycle()
+            OOUnsavedBackAlertHost(
+                discardAlertRequest = viewModel.discardAlertRequest,
+                onDiscardConfirm = viewModel::onDiscardConfirmed,
+            )
             DogInfoEditScreen(
                 petIconRes = petIconRes,
                 petName = petName,
