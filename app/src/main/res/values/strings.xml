@@ -7,6 +7,8 @@
     <string name="memo_screen_title">메모</string>
     <string name="memo_input_hint">메모장입니다.\n무엇이든 편하게 입력해 보세요!</string>
     <string name="save">저장</string>
+    <string name="save_feedback_saved">변경된 내용이 저장되었습니다.</string>
+    <string name="save_feedback_no_changes">변경된 내용이 없습니다.</string>
     <string name="dog_info_edit_screen_title">정보 수정</string>
     <string name="dog_info_edit_icon_label">아이콘</string>
     <string name="dog_info_edit_name_label">이름</string>

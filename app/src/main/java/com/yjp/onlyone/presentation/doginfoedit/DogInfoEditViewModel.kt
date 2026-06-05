@@ -45,6 +45,9 @@ class DogInfoEditViewModel @Inject constructor(
     private val _discardAlertRequest = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val discardAlertRequest: SharedFlow<Unit> = _discardAlertRequest.asSharedFlow()
 
+    private val _saveToastEvent = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    val saveToastEvent: SharedFlow<Boolean> = _saveToastEvent.asSharedFlow()
+
     private var savedPetInfo: PetInfo? = null
 
     init {
@@ -82,9 +85,14 @@ class DogInfoEditViewModel @Inject constructor(
 
     fun onSaveClick() {
         viewModelScope.launch {
+            if (!hasUnsavedChanges()) {
+                _saveToastEvent.emit(false)
+                return@launch
+            }
             val petInfo = currentPetInfo()
             petRepository.savePetInfo(petInfo)
             savedPetInfo = petInfo
+            _saveToastEvent.emit(true)
         }
     }
 

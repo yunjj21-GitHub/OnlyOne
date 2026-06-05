@@ -27,6 +27,9 @@ class MemoViewModel @Inject constructor(
     private val _discardAlertRequest = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val discardAlertRequest: SharedFlow<Unit> = _discardAlertRequest.asSharedFlow()
 
+    private val _saveToastEvent = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    val saveToastEvent: SharedFlow<Boolean> = _saveToastEvent.asSharedFlow()
+
     private var savedMemoContent = ""
 
     init {
@@ -47,8 +50,13 @@ class MemoViewModel @Inject constructor(
 
     fun onSaveClick() {
         viewModelScope.launch {
+            if (!hasUnsavedChanges()) {
+                _saveToastEvent.emit(false)
+                return@launch
+            }
             memoRepository.saveMemoContent(_memoContent.value)
             savedMemoContent = _memoContent.value
+            _saveToastEvent.emit(true)
         }
     }
 
