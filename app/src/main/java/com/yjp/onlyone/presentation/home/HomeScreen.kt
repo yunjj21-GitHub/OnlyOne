@@ -72,6 +72,7 @@ fun HomeScreen(
     onLocationPermissionClick: () -> Unit = {},
     onMemoClick: () -> Unit = {},
     onDogInfoEditClick: () -> Unit = {},
+    onPetIconClick: () -> Unit = {},
     onActivityStatClick: (HomeActivityType) -> Unit = {},
     onDismissPicker: () -> Unit = {},
     onConfirmPicker: (HomeActivityType, Int) -> Unit = { _, _ -> },
@@ -139,7 +140,13 @@ fun HomeScreen(
                         Image(
                             painter = painterResource(petIconRes),
                             contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = onPetIconClick,
+                                ),
                             contentScale = ContentScale.Fit,
                         )
                     }
@@ -160,13 +167,7 @@ fun HomeScreen(
                     onActivityStatClick = onActivityStatClick,
                     modifier = Modifier.padding(top = 16.dp),
                 )
-                if (isLocationPermissionGranted) {
-                    HomeLocationWeatherSection(locationAddress = locationAddress)
-                } else {
-                    HomeLocationPermissionPrompt(
-                        onAllowLocationClick = onLocationPermissionClick,
-                    )
-                }
+                HomeLocationWeatherSection()
             }
         }
 

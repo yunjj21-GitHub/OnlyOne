@@ -67,6 +67,7 @@ class HomeViewModel @Inject constructor(
     val navigationEvent: SharedFlow<HomeNavigation> = _navigationEvent.asSharedFlow()
 
     private var lastBackPressTimeMillis = 0L
+    private var petIconClickCount = 0
     private var loadedDateEpochDay: Long = todayLocalDate().toEpochDayValue()
 
     init {
@@ -123,6 +124,16 @@ class HomeViewModel @Inject constructor(
     fun onDogInfoEditClick() {
         viewModelScope.launch {
             _navigationEvent.emit(HomeNavigation.ToDogInfoEdit)
+        }
+    }
+
+    fun onPetIconClick() {
+        petIconClickCount++
+        if (petIconClickCount < DEVELOP_SCREEN_PET_ICON_CLICK_COUNT) return
+
+        petIconClickCount = 0
+        viewModelScope.launch {
+            _navigationEvent.emit(HomeNavigation.ToDevelop)
         }
     }
 
@@ -184,6 +195,7 @@ class HomeViewModel @Inject constructor(
         const val HAPPINESS_INDEX_MIN = 0
         const val HAPPINESS_INDEX_MAX = 100
         const val EXIT_BACK_PRESS_INTERVAL_MILLIS = 2_000L
+        const val DEVELOP_SCREEN_PET_ICON_CLICK_COUNT = 10
 
         @DrawableRes
         val DEFAULT_PET_ICON_RES: Int = R.drawable.ic_dog1

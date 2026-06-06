@@ -25,7 +25,15 @@
         <action
             android:id="@+id/action_home_to_dog_info_edit"
             app:destination="@id/dogInfoEditFragment" />
+        <action
+            android:id="@+id/action_home_to_develop"
+            app:destination="@id/developFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/developFragment"
+        android:name="com.yjp.onlyone.presentation.develop.DevelopFragment"
+        android:label="@string/develop_title" />
 
     <fragment
         android:id="@+id/dogInfoEditFragment"

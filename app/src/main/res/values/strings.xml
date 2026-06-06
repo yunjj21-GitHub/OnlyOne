@@ -4,6 +4,7 @@
     <string name="home_title">Home</string>
     <string name="memo_title">Memo</string>
     <string name="dog_info_edit_title">DogInfoEdit</string>
+    <string name="develop_title">Develop</string>
     <string name="memo_screen_title">메모</string>
     <string name="memo_input_hint">메모장입니다.\n무엇이든 편하게 입력해 보세요!</string>
     <string name="save">저장</string>

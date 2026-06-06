@@ -99,6 +99,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 },
                 onMemoClick = viewModel::onMemoClick,
                 onDogInfoEditClick = viewModel::onDogInfoEditClick,
+                onPetIconClick = viewModel::onPetIconClick,
                 onActivityStatClick = viewModel::onActivityStatClick,
                 onDismissPicker = viewModel::dismissPicker,
                 onConfirmPicker = viewModel::confirmPicker,
@@ -112,6 +113,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                             findNavController().navigate(R.id.action_home_to_memo)
                         HomeNavigation.ToDogInfoEdit ->
                             findNavController().navigate(R.id.action_home_to_dog_info_edit)
+                        HomeNavigation.ToDevelop ->
+                            findNavController().navigate(R.id.action_home_to_develop)
                     }
                 }
             }
