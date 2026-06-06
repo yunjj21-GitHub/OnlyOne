@@ -68,7 +68,10 @@ object LocationUtil {
                 Priority.PRIORITY_BALANCED_POWER_ACCURACY,
                 cancellationTokenSource.token,
             )
-                .addOnSuccessListener { location -> continuation.resume(location) }
+                .addOnSuccessListener { location ->
+                    continuation.resume(location)
+                    OOLog.d("사용자 현재 위치: longitude ${location.longitude}, latitude ${location.latitude}")
+                }
                 .addOnFailureListener { continuation.resume(null) }
         }
 
@@ -97,7 +100,10 @@ object LocationUtil {
             geocoder.getFromLocation(latitude, longitude, 1).orEmpty()
         }
 
-        return addresses.firstOrNull()?.toRegionName()?.takeIf { it.isNotBlank() }
+        val address: String? = addresses.firstOrNull()?.toRegionName()?.takeIf { it.isNotBlank() }
+        OOLog.d("사용자 현재 위치 주소명: $address")
+
+        return address
     }
 
     /** Android 13+ Geocoder API로 주소 목록을 조회한다. */
