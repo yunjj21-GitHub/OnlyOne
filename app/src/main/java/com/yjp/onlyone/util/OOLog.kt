@@ -5,7 +5,7 @@ import com.yjp.onlyone.BuildConfig
 
 object OOLog {
 
-    private const val DEFAULT_TAG = "OnlyOne"
+    private const val DEFAULT_TAG = "OOLog"
 
     fun v(message: String) = v(DEFAULT_TAG, message)
 
