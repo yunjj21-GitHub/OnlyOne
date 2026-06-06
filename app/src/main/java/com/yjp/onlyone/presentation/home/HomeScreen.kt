@@ -167,7 +167,13 @@ fun HomeScreen(
                     onActivityStatClick = onActivityStatClick,
                     modifier = Modifier.padding(top = 16.dp),
                 )
-                HomeLocationWeatherSection()
+                if (isLocationPermissionGranted) {
+                    HomeLocationWeatherSection(locationAddress = locationAddress)
+                } else {
+                    HomeLocationPermissionPrompt(
+                        onAllowLocationClick = onLocationPermissionClick,
+                    )
+                }
             }
         }
 
