@@ -3,9 +3,11 @@ package com.yjp.onlyone.di
 import com.yjp.onlyone.data.repository.HappinessRepositoryImpl
 import com.yjp.onlyone.data.repository.MemoRepositoryImpl
 import com.yjp.onlyone.data.repository.PetRepositoryImpl
+import com.yjp.onlyone.data.repository.WeatherDebugRepositoryImpl
 import com.yjp.onlyone.domain.repository.HappinessRepository
 import com.yjp.onlyone.domain.repository.MemoRepository
 import com.yjp.onlyone.domain.repository.PetRepository
+import com.yjp.onlyone.domain.repository.WeatherDebugRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -33,4 +35,10 @@ abstract class RepositoryModule {
     abstract fun bindHappinessRepository(
         impl: HappinessRepositoryImpl,
     ): HappinessRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindWeatherDebugRepository(
+        impl: WeatherDebugRepositoryImpl,
+    ): WeatherDebugRepository
 }

@@ -51,6 +51,22 @@ object LocationUtil {
         )
     }
 
+    /** 현재 위치를 기상청 격자 좌표(nx, ny)로 변환해 반환한다. 권한 없음·조회 실패 시 null. */
+    suspend fun getKmaGrid(context: Context): KmaGrid? = withContext(Dispatchers.IO) {
+        if (!hasPermission(context)) return@withContext null
+
+        val location = fetchLocation(context) ?: return@withContext null
+        val (nx, ny) = KmaGridConverter.toGrid(location.latitude, location.longitude)
+        OOLog.d("사용자 현재 위치 좌료값: ($nx, $ny)")
+
+        KmaGrid(
+            nx = nx,
+            ny = ny,
+            latitude = location.latitude,
+            longitude = location.longitude,
+        )
+    }
+
     /** Fused Location으로 현재 좌표를 가져온다. 실패 시 마지막 위치로 대체한다. */
     private suspend fun fetchLocation(context: Context): Location? {
         val client = LocationServices.getFusedLocationProviderClient(context)
@@ -189,6 +205,13 @@ class LocationRequester(
         pendingContinuation = null
     }
 }
+
+data class KmaGrid(
+    val nx: Int,
+    val ny: Int,
+    val latitude: Double,
+    val longitude: Double,
+)
 
 /** Address 필드를 조합해 "시·도 구·동 도로명 번지" 형식 문자열을 만든다. */
 private fun Address.toRegionName(): String {
