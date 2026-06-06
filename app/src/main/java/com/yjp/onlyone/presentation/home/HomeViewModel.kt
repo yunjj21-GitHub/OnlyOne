@@ -9,8 +9,8 @@ import com.yjp.onlyone.domain.happiness.HappinessIndexCalculator
 import com.yjp.onlyone.domain.model.HomeHappinessInput
 import com.yjp.onlyone.domain.repository.HappinessRepository
 import com.yjp.onlyone.domain.repository.PetRepository
+import com.yjp.onlyone.util.LocationUtil
 import com.yjp.onlyone.util.daysFromToToday
-import com.yjp.onlyone.util.hasLocationPermission
 import com.yjp.onlyone.util.toEpochDayValue
 import com.yjp.onlyone.util.todayLocalDate
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -57,8 +57,11 @@ class HomeViewModel @Inject constructor(
     private val _daysTogether = MutableStateFlow(0)
     val daysTogether: StateFlow<Int> = _daysTogether.asStateFlow()
 
-    private val _isLocationPermissionGranted = MutableStateFlow(hasLocationPermission(context))
+    private val _isLocationPermissionGranted = MutableStateFlow(LocationUtil.hasPermission(context))
     val isLocationPermissionGranted: StateFlow<Boolean> = _isLocationPermissionGranted.asStateFlow()
+
+    private val _locationAddress = MutableStateFlow("")
+    val locationAddress: StateFlow<String> = _locationAddress.asStateFlow()
 
     private val _navigationEvent = MutableSharedFlow<HomeNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<HomeNavigation> = _navigationEvent.asSharedFlow()
@@ -123,12 +126,27 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun refreshLocationPermissionState() {
-        _isLocationPermissionGranted.value = hasLocationPermission(context)
+    fun refreshLocation() {
+        viewModelScope.launch {
+            if (!LocationUtil.hasPermission(context)) {
+                _isLocationPermissionGranted.value = false
+                _locationAddress.value = ""
+                return@launch
+            }
+
+            _isLocationPermissionGranted.value = true
+            _locationAddress.value = LocationUtil.getRegionName(context).orEmpty()
+        }
     }
 
-    fun onLocationPermissionResult(granted: Boolean) {
-        _isLocationPermissionGranted.value = granted
+    fun onLocationPermissionDenied() {
+        _isLocationPermissionGranted.value = false
+        _locationAddress.value = ""
+    }
+
+    fun onLocationRegionLoaded(regionName: String?) {
+        _isLocationPermissionGranted.value = LocationUtil.hasPermission(context)
+        _locationAddress.value = regionName.orEmpty()
     }
 
     fun onBackPressed(): HomeBackPress {

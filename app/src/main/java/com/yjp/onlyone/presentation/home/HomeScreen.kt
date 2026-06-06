@@ -68,6 +68,7 @@ fun HomeScreen(
     activePicker: HomeHappinessPicker = HomeHappinessPicker.None,
     daysTogether: Int = 0,
     isLocationPermissionGranted: Boolean = false,
+    locationAddress: String = "",
     onLocationPermissionClick: () -> Unit = {},
     onMemoClick: () -> Unit = {},
     onDogInfoEditClick: () -> Unit = {},
@@ -163,7 +164,7 @@ fun HomeScreen(
                     modifier = Modifier.padding(top = 16.dp),
                 )
                 if (isLocationPermissionGranted) {
-                    HomeLocationWeatherSection()
+                    HomeLocationWeatherSection(locationAddress = locationAddress)
                 } else {
                     HomeLocationPermissionPrompt(
                         onAllowLocationClick = onLocationPermissionClick,
