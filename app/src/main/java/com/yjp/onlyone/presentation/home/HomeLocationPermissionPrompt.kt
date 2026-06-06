@@ -79,6 +79,7 @@ fun HomeLocationPermissionPrompt(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .padding(6.dp)
     ) {
         Box(
             modifier = Modifier
@@ -97,7 +98,6 @@ fun HomeLocationPermissionPrompt(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .offset(y = HomeLocationPromptTextOffsetY)
-                    .padding(end = 6.dp),
             ) {
                 Text(
                     text = stringResource(R.string.home_location_prompt_title),
