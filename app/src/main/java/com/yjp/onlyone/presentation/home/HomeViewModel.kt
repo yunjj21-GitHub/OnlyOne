@@ -73,6 +73,9 @@ class HomeViewModel @Inject constructor(
     private val _homeWeatherUi = MutableStateFlow(HomeWeatherUiState())
     val homeWeatherUi: StateFlow<HomeWeatherUiState> = _homeWeatherUi.asStateFlow()
 
+    private val _isWeatherLoading = MutableStateFlow(false)
+    val isWeatherLoading: StateFlow<Boolean> = _isWeatherLoading.asStateFlow()
+
     private val _navigationEvent = MutableSharedFlow<HomeNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<HomeNavigation> = _navigationEvent.asSharedFlow()
 
@@ -154,6 +157,7 @@ class HomeViewModel @Inject constructor(
                 _isLocationPermissionGranted.value = false
                 _locationAddress.value = ""
                 _homeWeatherUi.value = HomeWeatherUiState()
+                _isWeatherLoading.value = false
                 return@launch
             }
 
@@ -189,6 +193,7 @@ class HomeViewModel @Inject constructor(
         _isLocationPermissionGranted.value = false
         _locationAddress.value = ""
         _homeWeatherUi.value = HomeWeatherUiState()
+        _isWeatherLoading.value = false
     }
 
     fun onLocationRegionLoaded(regionName: String?) {
@@ -202,27 +207,32 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun loadHomeWeather(grid: KmaGrid?) {
-        val nx = grid?.nx ?: KmaGridConverter.FALLBACK_NX
-        val ny = grid?.ny ?: KmaGridConverter.FALLBACK_NY
-        val latitude = grid?.latitude ?: KmaGridConverter.FALLBACK_LATITUDE
-        val longitude = grid?.longitude ?: KmaGridConverter.FALLBACK_LONGITUDE
+        _isWeatherLoading.value = true
+        try {
+            val nx = grid?.nx ?: KmaGridConverter.FALLBACK_NX
+            val ny = grid?.ny ?: KmaGridConverter.FALLBACK_NY
+            val latitude = grid?.latitude ?: KmaGridConverter.FALLBACK_LATITUDE
+            val longitude = grid?.longitude ?: KmaGridConverter.FALLBACK_LONGITUDE
 
-        runCatching {
-            weatherRepository.fetchHomeWeather(
-                nx = nx,
-                ny = ny,
-                latitude = latitude,
-                longitude = longitude,
-            )
-        }.onSuccess { weather ->
-            _homeWeatherUi.value = HomeWeatherUiMapper.map(
-                weather = weather,
-                latitude = latitude,
-                longitude = longitude,
-            )
-            lastWeatherLoadedAtMs = System.currentTimeMillis()
-        }.onFailure { error ->
-            OOLog.e("홈 날씨 로드 실패: ${error.message}")
+            runCatching {
+                weatherRepository.fetchHomeWeather(
+                    nx = nx,
+                    ny = ny,
+                    latitude = latitude,
+                    longitude = longitude,
+                )
+            }.onSuccess { weather ->
+                _homeWeatherUi.value = HomeWeatherUiMapper.map(
+                    weather = weather,
+                    latitude = latitude,
+                    longitude = longitude,
+                )
+                lastWeatherLoadedAtMs = System.currentTimeMillis()
+            }.onFailure { error ->
+                OOLog.e("홈 날씨 로드 실패: ${error.message}")
+            }
+        } finally {
+            _isWeatherLoading.value = false
         }
     }
 

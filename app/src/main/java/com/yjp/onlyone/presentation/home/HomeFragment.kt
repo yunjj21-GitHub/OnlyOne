@@ -78,6 +78,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             val isLocationPermissionGranted by viewModel.isLocationPermissionGranted.collectAsStateWithLifecycle()
             val locationAddress by viewModel.locationAddress.collectAsStateWithLifecycle()
             val homeWeatherUi by viewModel.homeWeatherUi.collectAsStateWithLifecycle()
+            val isWeatherLoading by viewModel.isWeatherLoading.collectAsStateWithLifecycle()
 
             SideEffect {
                 showExitToast = { showToast(exitBackPressMessage) }
@@ -93,6 +94,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 isLocationPermissionGranted = isLocationPermissionGranted,
                 locationAddress = locationAddress,
                 homeWeatherUi = homeWeatherUi,
+                isWeatherLoading = isWeatherLoading,
                 onLocationPermissionClick = {
                     viewLifecycleOwner.lifecycleScope.launch {
                         val regionName = locationRequester.requestRegionName(

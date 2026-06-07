@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yjp.onlyone.R
 import com.yjp.onlyone.domain.model.HomeHappinessInput
+import com.yjp.onlyone.ui.component.OOLoadingOverlay
 import com.yjp.onlyone.ui.component.SkyBlueGradientProgressRing
 import com.yjp.onlyone.ui.dialog.ListPickerDialog
 import com.yjp.onlyone.ui.modifier.homeHappinessCardShadow
@@ -70,6 +71,7 @@ fun HomeScreen(
     isLocationPermissionGranted: Boolean = false,
     locationAddress: String = "",
     homeWeatherUi: HomeWeatherUiState = HomeWeatherUiState(),
+    isWeatherLoading: Boolean = false,
     onLocationPermissionClick: () -> Unit = {},
     onMemoClick: () -> Unit = {},
     onDogInfoEditClick: () -> Unit = {},
@@ -168,24 +170,32 @@ fun HomeScreen(
                     onActivityStatClick = onActivityStatClick,
                     modifier = Modifier.padding(top = 16.dp),
                 )
-                if (isLocationPermissionGranted) {
-                    HomeLocationWeatherSection(
-                        locationAddress = locationAddress,
-                        title = homeWeatherUi.walkTitle,
-                        currentTemperature = homeWeatherUi.currentTemperature,
-                        temperatureComparison = homeWeatherUi.temperatureComparison,
-                        weatherCondition = homeWeatherUi.weatherCondition,
-                        highTemperature = homeWeatherUi.highTemperature,
-                        lowTemperature = homeWeatherUi.lowTemperature,
-                        hourlyForecasts = homeWeatherUi.hourlyForecasts,
-                        currentWeatherIconRes = homeWeatherUi.currentWeatherIconRes,
-                    )
-                } else {
-                    HomeLocationPermissionPrompt(
-                        onAllowLocationClick = onLocationPermissionClick,
-                    )
+                when {
+                    !isLocationPermissionGranted -> {
+                        HomeLocationPermissionPrompt(
+                            onAllowLocationClick = onLocationPermissionClick,
+                        )
+                    }
+
+                    else -> {
+                        HomeLocationWeatherSection(
+                            locationAddress = locationAddress,
+                            title = homeWeatherUi.walkTitle,
+                            currentTemperature = homeWeatherUi.currentTemperature,
+                            temperatureComparison = homeWeatherUi.temperatureComparison,
+                            weatherCondition = homeWeatherUi.weatherCondition,
+                            highTemperature = homeWeatherUi.highTemperature,
+                            lowTemperature = homeWeatherUi.lowTemperature,
+                            hourlyForecasts = homeWeatherUi.hourlyForecasts,
+                            currentWeatherIconRes = homeWeatherUi.currentWeatherIconRes,
+                        )
+                    }
                 }
             }
+        }
+
+        if (isWeatherLoading) {
+            OOLoadingOverlay()
         }
 
         val activeHappinessPicker = activePicker as? HomeHappinessPicker.Active
