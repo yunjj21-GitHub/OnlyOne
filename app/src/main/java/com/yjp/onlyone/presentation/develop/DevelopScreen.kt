@@ -57,7 +57,7 @@ fun DevelopScreen(
         color = colorResource(R.color.black),
     )
     val cautionStyle = MaterialTheme.typography.titleMedium.copy(
-        fontSize = 24.sp,
+        fontSize = 22.sp,
         lineHeight = DevelopScreenCautionLineHeight,
         fontWeight = FontWeight.Bold,
         color = colorResource(R.color.caution),

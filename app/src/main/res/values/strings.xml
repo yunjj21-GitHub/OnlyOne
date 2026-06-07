@@ -6,7 +6,7 @@
     <string name="dog_info_edit_title">DogInfoEdit</string>
     <string name="develop_title">Develop</string>
     <string name="develop_weather_api_title">기상청 단기 예보 API</string>
-    <string name="develop_caution_message">※개발자용 화면입니다.</string>
+    <string name="develop_caution_message">※ 개발용 화면</string>
     <string name="memo_screen_title">메모</string>
     <string name="memo_input_hint">메모장입니다.\n무엇이든 편하게 입력해 보세요!</string>
     <string name="save">저장</string>
