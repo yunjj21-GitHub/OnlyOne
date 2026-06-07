@@ -32,6 +32,14 @@ private val locationPermissions = arrayOf(
 /** 위치 권한 확인 및 지역명 조회 유틸. */
 object LocationUtil {
 
+    private const val LOCATION_CACHE_TTL_MS = 2 * 60 * 1000L
+
+    @Volatile
+    private var cachedLocation: Location? = null
+
+    @Volatile
+    private var cachedLocationAtMs: Long = 0L
+
     /** 위치 권한(정밀/대략) 중 하나라도 허용됐는지 확인한다. */
     fun hasPermission(context: Context): Boolean {
         return locationPermissions.any { permission ->
@@ -44,11 +52,16 @@ object LocationUtil {
         if (!hasPermission(context)) return@withContext null
 
         val location = fetchLocation(context) ?: return@withContext null
-        resolveRegionName(
-            context = context,
-            latitude = location.latitude,
-            longitude = location.longitude,
-        )
+        resolveRegionName(context, location.latitude, location.longitude)
+    }
+
+    /** 이미 확보한 좌표로 지역명만 조회한다. (위치 재조회 없음) */
+    suspend fun resolveRegionName(
+        context: Context,
+        latitude: Double,
+        longitude: Double,
+    ): String? = withContext(Dispatchers.IO) {
+        resolveRegionNameInternal(context, latitude, longitude)
     }
 
     /** 현재 위치를 기상청 격자 좌표(nx, ny)로 변환해 반환한다. 권한 없음·조회 실패 시 null. */
@@ -67,10 +80,22 @@ object LocationUtil {
         )
     }
 
-    /** Fused Location으로 현재 좌표를 가져온다. 실패 시 마지막 위치로 대체한다. */
+    /** Fused Location으로 현재 좌표를 가져온다. 캐시 → 마지막 위치 → 새 조회 순. */
     private suspend fun fetchLocation(context: Context): Location? {
+        val now = System.currentTimeMillis()
+        cachedLocation?.let { cached ->
+            if (now - cachedLocationAtMs < LOCATION_CACHE_TTL_MS) {
+                return cached
+            }
+        }
+
         val client = LocationServices.getFusedLocationProviderClient(context)
-        return fetchCurrentLocation(client) ?: fetchLastLocation(client)
+        val location = fetchLastLocation(client) ?: fetchCurrentLocation(client)
+        if (location != null) {
+            cachedLocation = location
+            cachedLocationAtMs = now
+        }
+        return location
     }
 
     /** GPS/네트워크로 현재 위치를 새로 조회한다. */
@@ -101,7 +126,7 @@ object LocationUtil {
         }
 
     /** 위·경도 좌표를 주소 문자열(예: 서울특별시 중구 정동)로 바꾼다. */
-    private suspend fun resolveRegionName(
+    private suspend fun resolveRegionNameInternal(
         context: Context,
         latitude: Double,
         longitude: Double,
@@ -213,12 +238,17 @@ data class KmaGrid(
     val longitude: Double,
 )
 
-/** Address 필드를 조합해 "시·도 구·동 도로명 번지" 형식 문자열을 만든다. */
+/** Address 필드를 조합해 "시·도 구·동(도로명)" 형식 문자열을 만든다. 번지수는 제외한다. */
 private fun Address.toRegionName(): String {
     return listOfNotNull(
         adminArea?.takeIf { it.isNotBlank() },
         subLocality?.takeIf { it.isNotBlank() },
         thoroughfare?.takeIf { it.isNotBlank() },
-        subThoroughfare?.takeIf { it.isNotBlank() },
     ).joinToString(" ")
+        .removeTrailingLotNumber()
+}
+
+/** 마지막 토큰이 번지(34, 34-5 등)이면 제거한다. */
+private fun String.removeTrailingLotNumber(): String {
+    return replace(Regex("\\s+\\d+(-\\d+)?$"), "").trim()
 }

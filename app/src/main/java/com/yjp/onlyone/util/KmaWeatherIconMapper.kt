@@ -64,11 +64,13 @@ object KmaWeatherIconMapper {
         if (hasLightning(lightningValue)) {
             return if (hasRain(precipitationCode)) "천둥번개" else "낙뢰"
         }
-        return KmaWeatherCodeLabel.weather(
+        val label = KmaWeatherCodeLabel.weather(
             skyCode = skyCode,
             precipitationCode = precipitationCode,
             shortTerm = true,
         )
+        // SKY 누락 시 iconRes는 맑음/맑은밤으로 fallback — 문구도 동일하게 맞춘다.
+        return label.takeIf { it.isNotBlank() && it != "-" } ?: "맑음"
     }
 
     /** 개발자 화면용 — 원본 코드, 일출/일몰, 예보 시각을 함께 표시한다. */

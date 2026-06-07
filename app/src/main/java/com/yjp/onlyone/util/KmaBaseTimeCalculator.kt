@@ -125,14 +125,20 @@ object KmaBaseTimeCalculator {
      * API는 최근 24시간 자료만 제공하므로, 24시간 경계를 넘지 않는 가장 오래된 유효 슬롯을 고른다.
      */
     fun pastNowcastForComparison(now: LocalDateTime = LocalDateTime.now()): PastNowcastCandidate? {
+        return pastNowcastCandidates(now).firstOrNull()
+    }
+
+    /** 어제 비교용으로 시도할 수 있는 과거 실측 슬롯 목록 (최근 것부터). */
+    fun pastNowcastCandidates(now: LocalDateTime = LocalDateTime.now()): List<PastNowcastCandidate> {
         val maxLookbackHours = maxNowcastLookbackHours(now)
-        for (hoursAgo in maxLookbackHours downTo 1L) {
+        return (maxLookbackHours downTo 1L).mapNotNull { hoursAgo ->
             val base = nowcast(now.minusHours(hoursAgo))
             if (isNowcastBaseAvailable(now, base)) {
-                return PastNowcastCandidate(base = base, hoursAgo = hoursAgo)
+                PastNowcastCandidate(base = base, hoursAgo = hoursAgo)
+            } else {
+                null
             }
         }
-        return null
     }
 
     /** 초단기실황 base_time이 요청 시각 기준 API 제공 범위 안인지 확인한다. */

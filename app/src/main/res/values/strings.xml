@@ -29,7 +29,7 @@
         시간대를 추천해드려요!
     </string>
     <string name="home_location_permission_allow">위치 권한 허용</string>
-    <string name="home_weather_walk_title_default">오늘 0시~0시 산책하기 좋아요!</string>
+    <string name="home_weather_walk_title_default">오늘은 산책하기 어려워요ㅠㅠ</string>
     <string name="home_weather_temperature_default">0°</string>
     <string name="home_weather_temperature_comparison_default">어제보다 0° 높아요</string>
     <string name="home_weather_condition_default">맑음</string>

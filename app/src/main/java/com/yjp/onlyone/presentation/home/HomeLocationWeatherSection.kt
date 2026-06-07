@@ -18,7 +18,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,7 +31,7 @@ import com.yjp.onlyone.ui.theme.OnlyOneTheme
 private val HomeWeatherSectionTopPadding = 28.dp
 private val HomeWeatherSectionBottomPadding = 24.dp
 private val HomeWeatherTitleFontSize = 22.sp
-private val HomeWeatherTitleLineHeight = 24.sp
+private val HomeWeatherTitleLineHeight = 32.sp
 private val HomeWeatherLocationIconSize = 22.dp
 private val HomeWeatherLocationTextFontSize = 16.sp
 private val HomeWeatherLocationTextLineHeight = 20.sp
@@ -55,7 +58,8 @@ fun HomeLocationWeatherSection(
     currentTemperature: String = stringResource(R.string.home_weather_temperature_default),
     temperatureComparison: String = stringResource(R.string.home_weather_temperature_comparison_default),
     weatherCondition: String = stringResource(R.string.home_weather_condition_default),
-    highLowTemperature: String = stringResource(R.string.home_weather_high_low_default),
+    highTemperature: String = "0°",
+    lowTemperature: String = "0°",
     hourlyForecasts: List<HomeWeatherHourlyUi> = defaultHourlyForecasts(),
     @DrawableRes currentWeatherIconRes: Int = R.drawable.ic_sunny,
 ) {
@@ -153,7 +157,17 @@ fun HomeLocationWeatherSection(
                     style = detailStyle,
                 )
                 Text(
-                    text = highLowTemperature,
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("최고 ")
+                        }
+                        append(highTemperature)
+                        append(" ")
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("최저 ")
+                        }
+                        append(lowTemperature)
+                    },
                     style = highLowStyle,
                 )
             }
@@ -226,7 +240,7 @@ data class HomeWeatherHourlyUi(
 )
 
 private fun defaultHourlyForecasts(): List<HomeWeatherHourlyUi> {
-    val timeLabel = "오후 0시"
+    val timeLabel = "오후 12시"
     val temperature = "0°"
     return List(DEFAULT_HOURLY_FORECAST_COUNT) {
         HomeWeatherHourlyUi(
@@ -242,7 +256,7 @@ private fun defaultHourlyForecasts(): List<HomeWeatherHourlyUi> {
 private fun HomeLocationWeatherSectionPreview() {
     OnlyOneTheme {
         HomeLocationWeatherSection(
-            locationAddress = "서울특별시 중구 정동 34-5",
+            locationAddress = "서울특별시 중구 정동",
         )
     }
 }

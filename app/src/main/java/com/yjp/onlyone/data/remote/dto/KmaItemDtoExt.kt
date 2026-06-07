@@ -30,11 +30,37 @@ fun List<KmaItemDto>.forecastValuesForSlot(
     forecastDate: String,
     forecastTime: String,
 ): Map<String, String> {
-    return filter {
+    return forecastValuesForSlotOrNearest(forecastDate, forecastTime, allowNearest = false)
+}
+
+/** 정확한 슬롯이 없으면 이후 가장 가까운 예보 슬롯을 사용한다. */
+fun List<KmaItemDto>.forecastValuesForSlotOrNearest(
+    forecastDate: String,
+    forecastTime: String,
+    allowNearest: Boolean = true,
+): Map<String, String> {
+    val exact = filter {
         it.forecastDate == forecastDate && it.forecastTime == forecastTime
-    }.mapNotNull { item ->
+    }
+    if (exact.isNotEmpty()) {
+        return exact.toCategoryValueMap()
+    }
+    if (!allowNearest) return emptyMap()
+
+    val targetKey = forecastDate + forecastTime
+    return filter { !it.forecastDate.isNullOrBlank() && !it.forecastTime.isNullOrBlank() }
+        .groupBy { it.forecastDate.orEmpty() + it.forecastTime.orEmpty() }
+        .filterKeys { it >= targetKey }
+        .minByOrNull { it.key }
+        ?.value
+        ?.toCategoryValueMap()
+        ?: emptyMap()
+}
+
+private fun List<KmaItemDto>.toCategoryValueMap(): Map<String, String> {
+    return mapNotNull { item ->
         item.category?.let { category ->
-            category to (item.forecastValue.orEmpty())
+            category to item.forecastValue.orEmpty()
         }
     }.toMap()
 }

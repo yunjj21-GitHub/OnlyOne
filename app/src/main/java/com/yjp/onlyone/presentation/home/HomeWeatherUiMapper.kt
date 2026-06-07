@@ -6,6 +6,7 @@ import com.yjp.onlyone.domain.model.HomeWeather
 import com.yjp.onlyone.domain.model.WeatherSkySlot
 import com.yjp.onlyone.util.KmaWeatherIconMapper
 import com.yjp.onlyone.util.SunTimeUtil
+import com.yjp.onlyone.util.WalkRecommendationCalculator
 import java.time.LocalDateTime
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -18,17 +19,26 @@ object HomeWeatherUiMapper {
         longitude: Double,
         now: LocalDateTime = LocalDateTime.now(),
     ): HomeWeatherUiState {
+        val walkTitle = WalkRecommendationCalculator.formatTitle(
+            title = WalkRecommendationCalculator.recommend(
+                slots = weather.walkForecastSlots,
+                now = now,
+            ),
+            now = now,
+        )
+
         return HomeWeatherUiState(
+            walkTitle = walkTitle,
             currentTemperature = formatTemperature(weather.currentTemperatureCelsius),
             temperatureComparison = formatTemperatureComparison(
                 todayAverage = weather.todayAverageCelsius,
                 yesterdayAverage = weather.yesterdayAverageCelsius,
             ),
-            weatherCondition = weather.weatherCondition,
-            highLowTemperature = formatHighLow(
-                min = weather.minTemperatureCelsius,
-                max = weather.maxTemperatureCelsius,
+            weatherCondition = weatherLabel(
+                slot = weather.currentSky,
             ),
+            highTemperature = formatTemperature(weather.maxTemperatureCelsius),
+            lowTemperature = formatTemperature(weather.minTemperatureCelsius),
             currentWeatherIconRes = iconRes(
                 slot = weather.currentSky,
                 latitude = latitude,
@@ -48,6 +58,14 @@ object HomeWeatherUiMapper {
                 )
             },
             isLoaded = true,
+        )
+    }
+
+    private fun weatherLabel(slot: WeatherSkySlot): String {
+        return KmaWeatherIconMapper.weatherLabel(
+            skyCode = slot.skyCode,
+            precipitationCode = slot.precipitationCode,
+            lightningValue = slot.lightningValue,
         )
     }
 
@@ -77,10 +95,6 @@ object HomeWeatherUiMapper {
         return celsius?.let { "${it.roundToInt()}°" } ?: "-"
     }
 
-    fun formatHighLow(min: Float?, max: Float?): String {
-        return "최고 ${formatTemperature(max)} 최저 ${formatTemperature(min)}"
-    }
-
     fun formatTemperatureComparison(todayAverage: Float?, yesterdayAverage: Float?): String {
         if (todayAverage == null || yesterdayAverage == null) return "어제와 비교 정보 없음"
         val diff = (todayAverage - yesterdayAverage).roundToInt()
@@ -92,8 +106,7 @@ object HomeWeatherUiMapper {
     }
 
     fun formatHourlyTimeLabel(now: LocalDateTime, hourOffset: Int): String {
-        val target = now.plusHours(hourOffset.toLong())
-        val hour = target.hour
+        val hour = now.plusHours(hourOffset.toLong()).hour
         val amPm = if (hour < 12) "오전" else "오후"
         val displayHour = when (hour % 12) {
             0 -> 12
@@ -104,10 +117,12 @@ object HomeWeatherUiMapper {
 }
 
 data class HomeWeatherUiState(
+    val walkTitle: String = "오늘 0시~0시 산책하기 좋아요!",
     val currentTemperature: String = "-",
     val temperatureComparison: String = "어제와 비교 정보 없음",
     val weatherCondition: String = "-",
-    val highLowTemperature: String = "최고 - 최저 -",
+    val highTemperature: String = "-",
+    val lowTemperature: String = "-",
     @DrawableRes val currentWeatherIconRes: Int = R.drawable.ic_sunny,
     val hourlyForecasts: List<HomeWeatherHourlyUi> = emptyList(),
     val isLoaded: Boolean = false,

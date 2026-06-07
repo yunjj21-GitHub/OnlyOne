@@ -12,6 +12,8 @@ import com.yjp.onlyone.domain.repository.PetRepository
 import com.yjp.onlyone.domain.repository.WeatherRepository
 import com.yjp.onlyone.util.KmaGridConverter
 import com.yjp.onlyone.util.LocationUtil
+import com.yjp.onlyone.util.OOLog
+import com.yjp.onlyone.util.KmaGrid
 import com.yjp.onlyone.util.daysFromToToday
 import com.yjp.onlyone.util.toEpochDayValue
 import com.yjp.onlyone.util.todayLocalDate
@@ -23,6 +25,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
@@ -75,6 +79,7 @@ class HomeViewModel @Inject constructor(
     private var lastBackPressTimeMillis = 0L
     private var petIconClickCount = 0
     private var loadedDateEpochDay: Long = todayLocalDate().toEpochDayValue()
+    private var lastWeatherLoadedAtMs = 0L
 
     init {
         loadPetInfo()
@@ -153,8 +158,30 @@ class HomeViewModel @Inject constructor(
             }
 
             _isLocationPermissionGranted.value = true
-            _locationAddress.value = LocationUtil.getRegionName(context).orEmpty()
-            loadHomeWeather()
+
+            if (shouldSkipWeatherRefresh()) {
+                if (_locationAddress.value.isEmpty()) {
+                    _locationAddress.value = LocationUtil.getRegionName(context).orEmpty()
+                }
+                return@launch
+            }
+
+            val grid = LocationUtil.getKmaGrid(context)
+            coroutineScope {
+                val addressDeferred = async {
+                    if (grid != null) {
+                        LocationUtil.resolveRegionName(
+                            context = context,
+                            latitude = grid.latitude,
+                            longitude = grid.longitude,
+                        )
+                    } else {
+                        LocationUtil.getRegionName(context)
+                    }
+                }
+                loadHomeWeather(grid)
+                _locationAddress.value = addressDeferred.await().orEmpty()
+            }
         }
     }
 
@@ -167,13 +194,14 @@ class HomeViewModel @Inject constructor(
     fun onLocationRegionLoaded(regionName: String?) {
         _isLocationPermissionGranted.value = LocationUtil.hasPermission(context)
         _locationAddress.value = regionName.orEmpty()
-        if (_isLocationPermissionGranted.value) {
-            viewModelScope.launch { loadHomeWeather() }
+        if (_isLocationPermissionGranted.value && !shouldSkipWeatherRefresh()) {
+            viewModelScope.launch {
+                loadHomeWeather(LocationUtil.getKmaGrid(context))
+            }
         }
     }
 
-    private suspend fun loadHomeWeather() {
-        val grid = LocationUtil.getKmaGrid(context)
+    private suspend fun loadHomeWeather(grid: KmaGrid?) {
         val nx = grid?.nx ?: KmaGridConverter.FALLBACK_NX
         val ny = grid?.ny ?: KmaGridConverter.FALLBACK_NY
         val latitude = grid?.latitude ?: KmaGridConverter.FALLBACK_LATITUDE
@@ -192,7 +220,15 @@ class HomeViewModel @Inject constructor(
                 latitude = latitude,
                 longitude = longitude,
             )
+            lastWeatherLoadedAtMs = System.currentTimeMillis()
+        }.onFailure { error ->
+            OOLog.e("홈 날씨 로드 실패: ${error.message}")
         }
+    }
+
+    private fun shouldSkipWeatherRefresh(): Boolean {
+        val elapsed = System.currentTimeMillis() - lastWeatherLoadedAtMs
+        return elapsed < WEATHER_REFRESH_INTERVAL_MILLIS && _homeWeatherUi.value.isLoaded
     }
 
     fun onBackPressed(): HomeBackPress {
@@ -230,6 +266,7 @@ class HomeViewModel @Inject constructor(
         const val HAPPINESS_INDEX_MIN = 0
         const val HAPPINESS_INDEX_MAX = 100
         const val EXIT_BACK_PRESS_INTERVAL_MILLIS = 2_000L
+        const val WEATHER_REFRESH_INTERVAL_MILLIS = 5 * 60 * 1000L
         const val DEVELOP_SCREEN_PET_ICON_CLICK_COUNT = 10
 
         @DrawableRes

@@ -171,10 +171,12 @@ fun HomeScreen(
                 if (isLocationPermissionGranted) {
                     HomeLocationWeatherSection(
                         locationAddress = locationAddress,
+                        title = homeWeatherUi.walkTitle,
                         currentTemperature = homeWeatherUi.currentTemperature,
                         temperatureComparison = homeWeatherUi.temperatureComparison,
                         weatherCondition = homeWeatherUi.weatherCondition,
-                        highLowTemperature = homeWeatherUi.highLowTemperature,
+                        highTemperature = homeWeatherUi.highTemperature,
+                        lowTemperature = homeWeatherUi.lowTemperature,
                         hourlyForecasts = homeWeatherUi.hourlyForecasts,
                         currentWeatherIconRes = homeWeatherUi.currentWeatherIconRes,
                     )
