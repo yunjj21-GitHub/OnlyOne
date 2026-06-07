@@ -5,9 +5,13 @@ import com.yjp.onlyone.data.remote.dto.dailyTemperature
 import com.yjp.onlyone.data.remote.dto.itemsOrEmpty
 import com.yjp.onlyone.data.remote.dto.observationValue
 import com.yjp.onlyone.data.remote.dto.resolveDailyMinMax
+import com.yjp.onlyone.domain.model.CurrentSkyWeather
+import com.yjp.onlyone.domain.model.WeatherDebugResult
 import com.yjp.onlyone.domain.repository.WeatherDebugRepository
 import com.yjp.onlyone.util.KmaBaseTimeCalculator
 import com.yjp.onlyone.util.KmaWeatherCodeLabel
+import com.yjp.onlyone.util.KmaWeatherIconMapper
+import com.yjp.onlyone.util.SunTimeUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
@@ -19,11 +23,13 @@ class WeatherDebugRepositoryImpl @Inject constructor(
     private val api: KmaWeatherApiService,
 ) : WeatherDebugRepository {
 
-    override suspend fun fetchDebugText(
+    override suspend fun fetchDebugResult(
         nx: Int,
         ny: Int,
+        latitude: Double,
+        longitude: Double,
         locationNote: String,
-    ): String = withContext(Dispatchers.IO) {
+    ): WeatherDebugResult = withContext(Dispatchers.IO) {
         val now = LocalDateTime.now()
         val today = KmaBaseTimeCalculator.todayDate(now)
         val ncstBase = KmaBaseTimeCalculator.nowcast(now)
@@ -43,8 +49,14 @@ class WeatherDebugRepositoryImpl @Inject constructor(
             ny = ny,
         )
         val todayAvg = avg(dailyTemps.minTemp, dailyTemps.maxTemp)
+        val currentSkyWeather = resolveCurrentSkyWeather(
+            now = now,
+            ultra = ultra,
+            latitude = latitude,
+            longitude = longitude,
+        )
 
-        buildString {
+        val debugText = buildString {
             appendLine("[조회 좌표 / base_time]")
             appendLine("nx=$nx, ny=$ny")
             if (locationNote.isNotBlank()) {
@@ -52,6 +64,12 @@ class WeatherDebugRepositoryImpl @Inject constructor(
             }
             appendLine("Ncst ${ncstBase.label()}")
             appendLine("Ultra ${ultraBase.label()} / Vilage ${vilageBase.label()}")
+            appendLine()
+
+            appendLine("[현재 하늘 아이콘]")
+            appendLine("상태: ${currentSkyWeather.label}")
+            appendLine(KmaWeatherIconMapper.detailLabel(currentSkyWeather))
+            appendLine("출처 API: getUltraSrtFcst / SKY, PTY, LGT")
             appendLine()
 
             appendLine("[금일 최저 / 최고]")
@@ -77,6 +95,44 @@ class WeatherDebugRepositoryImpl @Inject constructor(
             appendLine("비교: ${compareAvg(todayAvg, pastTemp.temperature)}")
             appendLine("참고: ${pastTemp.note}")
         }
+
+        WeatherDebugResult(
+            debugText = debugText,
+            currentSkyWeather = currentSkyWeather,
+        )
+    }
+
+    private fun resolveCurrentSkyWeather(
+        now: LocalDateTime,
+        ultra: List<com.yjp.onlyone.data.remote.dto.KmaItemDto>,
+        latitude: Double,
+        longitude: Double,
+    ): CurrentSkyWeather {
+        val slot = KmaBaseTimeCalculator.forecastSlot(now, 0)
+        val values = ultra.filter {
+            it.forecastDate == slot.date && it.forecastTime == slot.time
+        }.associate { it.category.orEmpty() to it.forecastValue.orEmpty() }
+
+        val skyCode = values["SKY"]
+        val precipitationCode = values["PTY"]
+        val lightningValue = values["LGT"]
+        val sunPhase = SunTimeUtil.resolveSunPhase(
+            latitude = latitude,
+            longitude = longitude,
+            now = now,
+        )
+
+        return CurrentSkyWeather(
+            label = KmaWeatherIconMapper.weatherLabel(skyCode, precipitationCode, lightningValue),
+            skyCode = skyCode,
+            precipitationCode = precipitationCode,
+            lightningValue = lightningValue,
+            isNight = sunPhase.isNight,
+            sunriseTime = sunPhase.sunriseTime,
+            sunsetTime = sunPhase.sunsetTime,
+            forecastDate = slot.date,
+            forecastTime = slot.time,
+        )
     }
 
     /**
@@ -182,8 +238,10 @@ class WeatherDebugRepositoryImpl @Inject constructor(
         appendLine("$label ($timeLabel)")
         appendLine("  기온: $temp")
         appendLine("    └ API: $tempApi")
-        appendLine("  날씨: $weather (SKY=${values["SKY"] ?: "-"}, PTY=${values["PTY"] ?: "-"})")
-        appendLine("    └ API: getUltraSrtFcst / SKY, PTY")
+        appendLine(
+            "  날씨: $weather (SKY=${values["SKY"] ?: "-"}, PTY=${values["PTY"] ?: "-"}, LGT=${values["LGT"] ?: "-"})",
+        )
+        appendLine("    └ API: getUltraSrtFcst / SKY, PTY, LGT")
     }
 
     private fun formatSlotTime(date: String, time: String): String {

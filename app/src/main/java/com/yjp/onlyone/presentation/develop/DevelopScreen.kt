@@ -1,5 +1,6 @@
 package com.yjp.onlyone.presentation.develop
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -35,19 +36,20 @@ private val DevelopScreenTitleBottomPadding = 8.dp
 private val DevelopScreenFlowerSize = 140.dp
 private val DevelopScreenTitleLineHeight = 28.sp
 private val DevelopScreenCautionLineHeight = 24.sp
+private val DevelopScreenSkyIconSize = 88.dp
 
 @Composable
 fun DevelopScreen(
     viewModel: DevelopViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val debugText by viewModel.debugText.collectAsStateWithLifecycle()
-    DevelopScreen(debugText = debugText, modifier = modifier)
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    DevelopScreen(uiState = uiState, modifier = modifier)
 }
 
 @Composable
 fun DevelopScreen(
-    debugText: String,
+    uiState: DevelopUiState,
     modifier: Modifier = Modifier,
 ) {
     val titleStyle = MaterialTheme.typography.titleLarge.copy(
@@ -84,8 +86,17 @@ fun DevelopScreen(
             style = cautionStyle,
         )
 
+        if (uiState.skyWeatherIconRes != null) {
+            DevelopSkyWeatherPreview(
+                iconRes = uiState.skyWeatherIconRes,
+                label = uiState.skyWeatherLabel,
+                detail = uiState.skyWeatherDetail,
+                modifier = Modifier.padding(top = 16.dp),
+            )
+        }
+
         Text(
-            text = debugText,
+            text = uiState.debugText,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -117,10 +128,74 @@ fun DevelopScreen(
     }
 }
 
+@Composable
+private fun DevelopSkyWeatherPreview(
+    @DrawableRes iconRes: Int,
+    label: String,
+    detail: String,
+    modifier: Modifier = Modifier,
+) {
+    val black = colorResource(R.color.black)
+    val gray = colorResource(R.color.sub_text)
+    val sectionTitleStyle = MaterialTheme.typography.titleMedium.copy(
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        color = black,
+    )
+    val labelStyle = MaterialTheme.typography.titleLarge.copy(
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        color = black,
+    )
+    val detailStyle = MaterialTheme.typography.bodySmall.copy(
+        fontFamily = FontFamily.Monospace,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        color = gray,
+    )
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            painter = painterResource(iconRes),
+            contentDescription = label,
+            modifier = Modifier.size(DevelopScreenSkyIconSize),
+            contentScale = ContentScale.Fit,
+        )
+        Column(
+            modifier = Modifier.padding(start = 16.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.develop_current_sky_title),
+                style = sectionTitleStyle,
+            )
+            Text(
+                text = label,
+                modifier = Modifier.padding(top = 4.dp),
+                style = labelStyle,
+            )
+            Text(
+                text = detail,
+                modifier = Modifier.padding(top = 4.dp),
+                style = detailStyle,
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun DevelopScreenPreview() {
     OnlyOneTheme {
-        DevelopScreen(debugText = "[금일 최저 / 최고]\n최저 16° / 최고 29°\n출처 API: getVilageFcst")
+        DevelopScreen(
+            uiState = DevelopUiState(
+                skyWeatherIconRes = R.drawable.ic_cloudy,
+                skyWeatherLabel = "흐림",
+                skyWeatherDetail = "SKY=4 PTY=0 LGT=0 (밤, 일출 05:12 일몰 19:48) · 20260606 2300",
+                debugText = "[금일 최저 / 최고]\n최저 16° / 최고 29°",
+            ),
+        )
     }
 }

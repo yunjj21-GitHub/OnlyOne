@@ -14,6 +14,8 @@ object KmaGridConverter {
     /** 위치 조회 실패 시 사용하는 서울 기본 격자. */
     const val FALLBACK_NX = 60
     const val FALLBACK_NY = 127
+    const val FALLBACK_LATITUDE = 37.5665
+    const val FALLBACK_LONGITUDE = 126.9780
 
     fun toGrid(latitude: Double, longitude: Double): Pair<Int, Int> {
         val re = EARTH_RADIUS_KM / GRID_SPACING_KM
