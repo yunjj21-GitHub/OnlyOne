@@ -69,6 +69,7 @@ fun HomeScreen(
     daysTogether: Int = 0,
     isLocationPermissionGranted: Boolean = false,
     locationAddress: String = "",
+    homeWeatherUi: HomeWeatherUiState = HomeWeatherUiState(),
     onLocationPermissionClick: () -> Unit = {},
     onMemoClick: () -> Unit = {},
     onDogInfoEditClick: () -> Unit = {},
@@ -168,7 +169,15 @@ fun HomeScreen(
                     modifier = Modifier.padding(top = 16.dp),
                 )
                 if (isLocationPermissionGranted) {
-                    HomeLocationWeatherSection(locationAddress = locationAddress)
+                    HomeLocationWeatherSection(
+                        locationAddress = locationAddress,
+                        currentTemperature = homeWeatherUi.currentTemperature,
+                        temperatureComparison = homeWeatherUi.temperatureComparison,
+                        weatherCondition = homeWeatherUi.weatherCondition,
+                        highLowTemperature = homeWeatherUi.highLowTemperature,
+                        hourlyForecasts = homeWeatherUi.hourlyForecasts,
+                        currentWeatherIconRes = homeWeatherUi.currentWeatherIconRes,
+                    )
                 } else {
                     HomeLocationPermissionPrompt(
                         onAllowLocationClick = onLocationPermissionClick,

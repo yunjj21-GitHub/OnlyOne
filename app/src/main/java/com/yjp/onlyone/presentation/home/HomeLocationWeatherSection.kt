@@ -165,7 +165,8 @@ fun HomeLocationWeatherSection(
                 .padding(top = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            hourlyForecasts.forEach { forecast ->
+            val displayHourlyForecasts = hourlyForecasts.ifEmpty { defaultHourlyForecasts() }
+            displayHourlyForecasts.forEach { forecast ->
                 HomeWeatherHourlyItem(
                     forecast = forecast,
                     modifier = Modifier.weight(1f),

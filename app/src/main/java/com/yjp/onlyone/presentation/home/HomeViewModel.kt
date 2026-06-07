@@ -9,6 +9,8 @@ import com.yjp.onlyone.domain.happiness.HappinessIndexCalculator
 import com.yjp.onlyone.domain.model.HomeHappinessInput
 import com.yjp.onlyone.domain.repository.HappinessRepository
 import com.yjp.onlyone.domain.repository.PetRepository
+import com.yjp.onlyone.domain.repository.WeatherRepository
+import com.yjp.onlyone.util.KmaGridConverter
 import com.yjp.onlyone.util.LocationUtil
 import com.yjp.onlyone.util.daysFromToToday
 import com.yjp.onlyone.util.toEpochDayValue
@@ -30,6 +32,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val petRepository: PetRepository,
     private val happinessRepository: HappinessRepository,
+    private val weatherRepository: WeatherRepository,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -62,6 +65,9 @@ class HomeViewModel @Inject constructor(
 
     private val _locationAddress = MutableStateFlow("")
     val locationAddress: StateFlow<String> = _locationAddress.asStateFlow()
+
+    private val _homeWeatherUi = MutableStateFlow(HomeWeatherUiState())
+    val homeWeatherUi: StateFlow<HomeWeatherUiState> = _homeWeatherUi.asStateFlow()
 
     private val _navigationEvent = MutableSharedFlow<HomeNavigation>(extraBufferCapacity = 1)
     val navigationEvent: SharedFlow<HomeNavigation> = _navigationEvent.asSharedFlow()
@@ -142,22 +148,51 @@ class HomeViewModel @Inject constructor(
             if (!LocationUtil.hasPermission(context)) {
                 _isLocationPermissionGranted.value = false
                 _locationAddress.value = ""
+                _homeWeatherUi.value = HomeWeatherUiState()
                 return@launch
             }
 
             _isLocationPermissionGranted.value = true
             _locationAddress.value = LocationUtil.getRegionName(context).orEmpty()
+            loadHomeWeather()
         }
     }
 
     fun onLocationPermissionDenied() {
         _isLocationPermissionGranted.value = false
         _locationAddress.value = ""
+        _homeWeatherUi.value = HomeWeatherUiState()
     }
 
     fun onLocationRegionLoaded(regionName: String?) {
         _isLocationPermissionGranted.value = LocationUtil.hasPermission(context)
         _locationAddress.value = regionName.orEmpty()
+        if (_isLocationPermissionGranted.value) {
+            viewModelScope.launch { loadHomeWeather() }
+        }
+    }
+
+    private suspend fun loadHomeWeather() {
+        val grid = LocationUtil.getKmaGrid(context)
+        val nx = grid?.nx ?: KmaGridConverter.FALLBACK_NX
+        val ny = grid?.ny ?: KmaGridConverter.FALLBACK_NY
+        val latitude = grid?.latitude ?: KmaGridConverter.FALLBACK_LATITUDE
+        val longitude = grid?.longitude ?: KmaGridConverter.FALLBACK_LONGITUDE
+
+        runCatching {
+            weatherRepository.fetchHomeWeather(
+                nx = nx,
+                ny = ny,
+                latitude = latitude,
+                longitude = longitude,
+            )
+        }.onSuccess { weather ->
+            _homeWeatherUi.value = HomeWeatherUiMapper.map(
+                weather = weather,
+                latitude = latitude,
+                longitude = longitude,
+            )
+        }
     }
 
     fun onBackPressed(): HomeBackPress {
