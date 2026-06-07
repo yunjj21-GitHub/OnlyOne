@@ -19,7 +19,9 @@ import com.yjp.onlyone.base.BaseFragment
 import com.yjp.onlyone.base.setThemeContent
 import com.yjp.onlyone.databinding.FragmentHomeBinding
 import com.yjp.onlyone.ui.component.rememberOOToast
+import com.yjp.onlyone.util.LocationPermissionPrefs
 import com.yjp.onlyone.util.LocationRequester
+import com.yjp.onlyone.util.LocationUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -108,6 +110,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             )
         }
         viewLifecycleOwner.lifecycleScope.launch {
+            requestFirstLaunchLocationPermissionIfNeeded()
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.navigationEvent.collect { event ->
                     when (event) {
@@ -126,5 +131,24 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onDestroyView() {
         showExitToast = null
         super.onDestroyView()
+    }
+
+    private suspend fun requestFirstLaunchLocationPermissionIfNeeded() {
+        val context = requireContext()
+        if (!LocationPermissionPrefs.shouldShowFirstLaunchPrompt(context)) return
+
+        LocationPermissionPrefs.markFirstLaunchPromptShown(context)
+
+        if (LocationUtil.hasPermission(context)) {
+            viewModel.onLocationRegionLoaded(LocationUtil.getRegionName(context))
+            return
+        }
+
+        val granted = locationRequester.requestPermissionOnly()
+        if (granted) {
+            viewModel.onLocationRegionLoaded(LocationUtil.getRegionName(context))
+        } else {
+            viewModel.onLocationPermissionDenied()
+        }
     }
 }

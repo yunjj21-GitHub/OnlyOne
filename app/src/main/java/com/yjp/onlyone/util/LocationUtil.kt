@@ -186,6 +186,12 @@ class LocationRequester(
             resumePermissionRequest(granted)
         }
 
+    /** 시스템 위치 권한 다이얼로그만 띄운다. 이미 허용됐으면 true. */
+    suspend fun requestPermissionOnly(): Boolean {
+        if (LocationUtil.hasPermission(fragment.requireContext())) return true
+        return requestPermission()
+    }
+
     /**
      * 권한이 없으면 요청하고, 거부 시 [onDenied]를 호출한다.
      * 권한이 있거나 허용되면 지역명을 조회해 반환한다.
