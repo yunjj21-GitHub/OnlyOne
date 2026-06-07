@@ -91,6 +91,7 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.gson)
+    implementation(libs.commons.suncalc)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
